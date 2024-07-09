@@ -1,0 +1,2 @@
+class WganGenerator:
+  pass
