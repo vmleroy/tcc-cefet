@@ -3,9 +3,10 @@ import keras as k
 class WganGenerator:
   model = k.models.Sequential()
   
-  def __init__ (self, latent_dim, output_shape):
+  def __init__ (self, batch_size, latent_dim, output_shape):
     # Input layer
-    self.model.add(k.layers.InputLayer(input_shape=(latent_dim,)))
+    self.model.add(k.layers.InputLayer(input_shape=(latent_dim,), batch_size=batch_size))
+    self.model.add(k.layers.Reshape((1, 1, latent_dim)))
     
     # Dense layers
     self.model.add(k.layers.Conv2DTranspose(256, (4, 4), strides=(2, 2), padding='same'))
