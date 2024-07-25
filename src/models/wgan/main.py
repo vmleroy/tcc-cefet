@@ -4,8 +4,8 @@ from critic import WganCritic
 from generator import WganGenerator
 
 batch_size = 1
-critic_input_shape = (16, 11, 3)
-samples_shape = (batch_size, 16, 11, 3)
+critic_input_shape = (32, 32, 3)
+samples_shape = (batch_size, 32, 32, 3)
 
 critic_samples = keras.ops.ones(samples_shape)
 generator_samples = keras.ops.ones((batch_size, 10))

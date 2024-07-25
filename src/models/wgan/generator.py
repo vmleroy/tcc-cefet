@@ -9,7 +9,7 @@ class WganGenerator:
     self.model.add(k.layers.Reshape((1, 1, latent_dim)))
     
     # Dense layers
-    self.model.add(k.layers.Conv2DTranspose(256, (4, 4), strides=(2, 2), padding='same'))
+    self.model.add(k.layers.Conv2DTranspose(256, (4, 4), strides=(4, 4), padding='same'))
     self.model.add(k.layers.ReLU())
     self.model.add(k.layers.BatchNormalization())
     
@@ -22,7 +22,7 @@ class WganGenerator:
     self.model.add(k.layers.BatchNormalization())
     
     # Output layer
-    self.model.add(k.layers.Conv2D(output_shape[-1], (32, 32), activation='tanh', padding='same'))    
+    self.model.add(k.layers.Conv2DTranspose(output_shape[-1], (32, 32), strides=(2,2), activation='tanh', padding='same'))    
 
     
     
