@@ -1,5 +1,7 @@
+import os
 import numpy as np
 import tensorflow as tf
+import keras
 
 def wasserstein_loss(y_true, y_pred):
     return tf.reduce_mean(y_true * y_pred)
@@ -17,6 +19,17 @@ def generate_fake_samples(generator, latent_dim, n_samples):
     y = -np.ones((n_samples, 1))
     return X, y
   
+
+
+def load_real_samples(game_dir):
+    # import data from data directory representing the dataset
+    files = os.listdir(game_dir)
+    samples = []
+    for file in files:
+        sample = np.load(os.path.join(game_dir, file))
+        samples.append(sample)
+    samples = np.array(samples)
+    return samples
 
 
 def generate_real_samples(dataset, n_samples):

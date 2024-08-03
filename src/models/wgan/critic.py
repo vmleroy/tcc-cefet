@@ -1,9 +1,10 @@
 import keras as k
+from utils import wasserstein_loss
 
 class WganCritic:
   model = k.models.Sequential()
   
-  def __init__(self, batch_size, input_shape):
+  def __init__(self, batch_size, input_shape, optimizer=k.optimizers.RMSprop(learning_rate=0.00005)):
     # Input layer -- must be the size of the image
     self.model.add(k.layers.InputLayer(shape=input_shape, batch_size=batch_size))
     
@@ -25,5 +26,8 @@ class WganCritic:
     
     # Output layer
     self.model.add(k.layers.Dense(1))
+    
+    optimizer = k.optimizers.RMSprop(learning_rate=0.00005)
+    self.model.compile(loss=wasserstein_loss, optimizer=optimizer)
     
     
