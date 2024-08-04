@@ -22,6 +22,8 @@ print('\n\n')
 game_dir = os.path.join(os.getcwd(), 'src/data/mario-samples/translated-samples')
 dataset = load_real_samples(game_dir)
 
+X_real, Y_real = generate_real_samples(dataset, batch_size)
+
 # for step in range(n_steps):
 #     # Update the critic
 #     for _ in range(n_steps_critic):

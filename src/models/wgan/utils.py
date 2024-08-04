@@ -21,16 +21,11 @@ def generate_fake_samples(generator, latent_dim, n_samples):
 
 
 def load_real_samples(game_dir):
-    print('Loading samples...')
-    print('\tGame directory:', game_dir)
     # import data from data directory representing the dataset
     files = os.listdir(game_dir)
     files.sort()
-    print(f"\tFiles in game directory: {len(files)}")
-    print('\tReading files...')
     samples = []
     for file in files:
-        print(f"\t\tReading file: {file}")
         with open(os.path.join(game_dir, file), 'r') as f:
             sample = []
             for line in f:
@@ -42,12 +37,9 @@ def load_real_samples(game_dir):
                     aux.append(char)
                 sample.append(aux)
         sample = np.array(sample)
-        print(f"\t\t\tSample shape: {sample.shape}")
         samples.append(sample)
     samples = np.array(samples)
-    print("Samples loaded")
-    print(f"\tSamples shape: {samples.shape}")
-    print()
+    return samples
     
 def generate_real_samples(dataset, n_samples):
     ix = np.random.randint(0, dataset.shape[0], n_samples)
