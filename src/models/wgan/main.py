@@ -20,9 +20,13 @@ generator = WganGenerator(output_shape=(32, 32, 3), latent_dim=latent_dim, batch
 print('\n\n')
 
 game_dir = os.path.join(os.getcwd(), 'src/data/mario-samples/translated-samples')
-dataset = load_real_samples(game_dir)
+dataset, labels = load_real_samples(game_dir)
+labels = label_encoding(labels)
 
+num_batches = dataset.shape[0] / batch_size
 X_real, Y_real = generate_real_samples(dataset, batch_size)
+X_fake, Y_fake = generate_fake_samples(generator, latent_dim, batch_size)
+print(X_fake.shape)
 
 # for step in range(n_steps):
 #     # Update the critic

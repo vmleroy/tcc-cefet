@@ -2,9 +2,16 @@ import os
 import numpy as np
 import tensorflow as tf
 
+from sklearn.preprocessing import LabelEncoder
+
 def wasserstein_loss(y_true, y_pred):
     return tf.reduce_mean(y_true * y_pred)
   
+
+def label_encoding(labels):
+    le = LabelEncoder()
+    le.fit(labels)
+    return le
 
 
 def generate_latent_points(latent_dim, n_samples):
@@ -14,7 +21,7 @@ def generate_latent_points(latent_dim, n_samples):
   
 def generate_fake_samples(generator, latent_dim, n_samples):
     x_input = generate_latent_points(latent_dim, n_samples)
-    X = generator.predict(x_input)
+    X = generator.model.predict(x_input)
     y = -np.ones((n_samples, 1))
     return X, y
   
@@ -25,6 +32,7 @@ def load_real_samples(game_dir):
     files = os.listdir(game_dir)
     files.sort()
     samples = []
+    labels = []
     for file in files:
         with open(os.path.join(game_dir, file), 'r') as f:
             sample = []
@@ -35,11 +43,13 @@ def load_real_samples(game_dir):
                 aux = []
                 for char in line:
                     aux.append(char)
+                    if char not in labels:
+                        labels.append(char)
                 sample.append(aux)
         sample = np.array(sample)
         samples.append(sample)
     samples = np.array(samples)
-    return samples
+    return samples, labels
     
 def generate_real_samples(dataset, n_samples):
     ix = np.random.randint(0, dataset.shape[0], n_samples)
