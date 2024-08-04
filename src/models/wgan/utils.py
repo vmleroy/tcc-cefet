@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import tensorflow as tf
-import keras
 
 def wasserstein_loss(y_true, y_pred):
     return tf.reduce_mean(y_true * y_pred)
@@ -38,9 +37,13 @@ def load_real_samples(game_dir):
                 if line == '' or line == '\n':
                     continue
                 line = line.removesuffix('\n').strip()
-                sample.append(line.split(','))
+                aux = []
+                for char in line:
+                    aux.append(char)
+                sample.append(aux)
+        sample = np.array(sample)
+        print(f"\t\t\tSample shape: {sample.shape}")
         samples.append(sample)
-    print('\tFiles read')
     samples = np.array(samples)
     print("Samples loaded")
     print(f"\tSamples shape: {samples.shape}")
