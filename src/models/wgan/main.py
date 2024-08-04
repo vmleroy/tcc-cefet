@@ -17,8 +17,9 @@ generator = WganGenerator(output_shape=(32, 32, 3), latent_dim=latent_dim, batch
 # Y = np.ones((batch_size, 1))
 # X = np.random.randn(batch_size * latent_dim)
 
+print('\n\n')
+
 game_dir = os.path.join(os.getcwd(), 'src/data/mario-samples/translated-samples')
-print('GAME DIR:', game_dir)
 dataset = load_real_samples(game_dir)
 
 # for step in range(n_steps):

@@ -5,7 +5,7 @@ class WganGenerator:
   
   def __init__ (self, batch_size, latent_dim, output_shape):
     # Input layer
-    self.model.add(k.layers.InputLayer(input_shape=(latent_dim,), batch_size=batch_size))
+    self.model.add(k.layers.InputLayer(shape=(latent_dim,), batch_size=batch_size))
     self.model.add(k.layers.Reshape((1, 1, latent_dim)))
     
     # Dense layers
