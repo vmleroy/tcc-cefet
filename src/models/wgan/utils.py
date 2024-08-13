@@ -7,11 +7,11 @@ from sklearn.preprocessing import LabelEncoder
 def wasserstein_loss(y_true, y_pred):
     return tf.reduce_mean(y_true * y_pred)
   
-
 def label_encoding(labels):
     le = LabelEncoder()
     le.fit(labels)
     return le
+
 
 
 def generate_latent_points(latent_dim, n_samples):
@@ -22,12 +22,12 @@ def generate_latent_points(latent_dim, n_samples):
 def generate_fake_samples(generator, latent_dim, n_samples):
     x_input = generate_latent_points(latent_dim, n_samples)
     X = generator.model.predict(x_input)
-    y = -np.ones((n_samples, 1))
+    y = np.ones((n_samples, 1))
     return X, y
   
 
 
-def load_real_samples(game_dir):
+def load_real_samples(game_dir, number_blocks=3):
     # import data from data directory representing the dataset
     files = os.listdir(game_dir)
     files.sort()
@@ -42,11 +42,12 @@ def load_real_samples(game_dir):
                 line = line.removesuffix('\n').strip()
                 aux = []
                 for char in line:
+                    char = int(char)
                     aux.append(char)
                     if char not in labels:
                         labels.append(char)
                 sample.append(aux)
-        sample = np.array(sample)
+        sample = np.stack([sample] * number_blocks, axis=-1)
         samples.append(sample)
     samples = np.array(samples)
     return samples, labels
@@ -54,5 +55,5 @@ def load_real_samples(game_dir):
 def generate_real_samples(dataset, n_samples):
     ix = np.random.randint(0, dataset.shape[0], n_samples)
     X = dataset[ix]
-    y = np.ones((n_samples, 1))
+    y = -np.ones((n_samples, 1))
     return X, y

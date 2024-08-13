@@ -1,4 +1,5 @@
 import keras as k
+from utils import wasserstein_loss
 
 class WganGenerator:
   model = k.models.Sequential()
@@ -23,6 +24,9 @@ class WganGenerator:
     
     # Output layer
     self.model.add(k.layers.Conv2DTranspose(output_shape[-1], (32, 32), strides=(2,2), activation='tanh', padding='same'))    
+    
+    optimizer = k.optimizers.RMSprop(learning_rate=0.00005)
+    self.model.compile(loss=wasserstein_loss, optimizer=optimizer)
 
     
     
