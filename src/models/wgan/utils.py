@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
 from sklearn.preprocessing import LabelEncoder
 
@@ -57,3 +58,28 @@ def generate_real_samples(dataset, n_samples):
     X = dataset[ix]
     y = -np.ones((n_samples, 1))
     return X, y
+
+
+
+def summarize_performance(step, generator, latent_dim, n_blocks, game_dir, n_samples=10):
+    X, _ = generate_fake_samples(generator, latent_dim, n_samples)
+    print('SHAPE FAKE', type(X), X.shape)
+    print('NP SUM', np.sum(X, axis = 1))
+    print('NP ARGMAX', np.argmax(X, axis = 1))
+    if not os.path.exists(os.path.join(game_dir, 'generated', f'{step+1}')):
+        os.makedirs(os.path.join(game_dir, 'generated', f'{step+1}'))
+    with open(os.path.join(game_dir, 'generated', f'{step+1}', 'generated.txt'), 'w') as f:
+        for sample in X:
+            for row in sample:
+                for block in row:
+                    block_value = np.abs(block)
+                    f.write(block_value)
+                f.write('\n')
+            f.write('\n')
+    
+def plot_history(c1_hist, c2_hist, g_hist):
+    plt.plot(c1_hist, label='crit_real')
+    plt.plot(c2_hist, label='crit_fake')
+    plt.plot(g_hist, label='gen')
+    plt.legend()
+    plt.show()
