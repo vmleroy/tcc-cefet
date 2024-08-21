@@ -13,6 +13,9 @@ def label_encoding(labels):
     le.fit(labels)
     return le
 
+def one_hot_encode(y, n_classes):
+    return np.eye(n_classes, dtype='uint8')[y]
+
 
 
 def generate_latent_points(latent_dim, n_samples):
@@ -28,7 +31,7 @@ def generate_fake_samples(generator, latent_dim, n_samples):
   
 
 
-def load_real_samples(game_dir, number_blocks=3):
+def load_real_samples(game_dir, number_blocks=10):
     # import data from data directory representing the dataset
     files = os.listdir(game_dir)
     files.sort()
@@ -48,7 +51,7 @@ def load_real_samples(game_dir, number_blocks=3):
                     if char not in labels:
                         labels.append(char)
                 sample.append(aux)
-        sample = np.stack([sample] * number_blocks, axis=-1)
+            sample = np.stack([sample] * number_blocks, axis=-1)
         samples.append(sample)
     samples = np.array(samples)
     return samples, labels
@@ -63,18 +66,11 @@ def generate_real_samples(dataset, n_samples):
 
 def summarize_performance(step, generator, latent_dim, n_blocks, game_dir, n_samples=10):
     X, _ = generate_fake_samples(generator, latent_dim, n_samples)
-    print('SHAPE FAKE', type(X), X.shape)
-    print('NP SUM', np.sum(X, axis = 1))
-    print('NP ARGMAX', np.argmax(X, axis = 1))
-    if not os.path.exists(os.path.join(game_dir, 'generated', f'{step+1}')):
-        os.makedirs(os.path.join(game_dir, 'generated', f'{step+1}'))
-    with open(os.path.join(game_dir, 'generated', f'{step+1}', 'generated.txt'), 'w') as f:
+    X = np.argmax(X, axis=-1)
+    with open(os.path.join(game_dir, step, f'generated.txt'), 'w') as f:
         for sample in X:
             for row in sample:
-                for block in row:
-                    block_value = np.abs(block)
-                    f.write(block_value)
-                f.write('\n')
+                f.write(''.join([str(x) for x in row]) + '\n')
             f.write('\n')
     
 def plot_history(c1_hist, c2_hist, g_hist):
