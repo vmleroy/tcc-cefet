@@ -88,6 +88,7 @@ def unify_and_translate_mario_samples(game_dir):
   for i in range(len(translated_samples)):
     translated_samples[i] = [item for sublist in translated_samples[i] for item in sublist]
   print('Samples concatenated')
+  print()
   
   print('Saving unified samples at json...')
   json_file = os.path.join(game_dir, 'unified_samples.json')
@@ -144,25 +145,18 @@ def generate_zelda_samples(files):
     print('Generated samples:', rooms_count)
     samples_count += rooms_count
     print('Total samples:', samples_count)     
-    print('Removing duplicates...')
-    samples_no_duplicates = []
-    for sample in samples:
-      if sample not in samples_no_duplicates:
-        samples_no_duplicates.append(sample)
-    print('Removed duplicates:', len(samples_no_duplicates))
     print()
   
-  print('Total samples:', len(samples_no_duplicates))
   print('Saving samples...')
   dir_name = 'src/data/zelda/samples'
   if not os.path.exists(dir_name):
     print('\tCreating directory:', dir_name)
     os.mkdir(dir_name)
     print('\tDirectory created')
-  for i in range(len(samples_no_duplicates)):
+  for i in range(len(samples)):
     json_file = f'{dir_name}/sample_{i}.json'
     with open(json_file, 'w') as f:
-      json.dump(samples_no_duplicates[i], f)
+      json.dump(samples[i], f)
   print('Samples saved')
   print()
 
@@ -190,10 +184,20 @@ def unify_and_translate_zelda_samples(game_dir):
   print('Samples translated')
   print()
   
+  print('Removing duplicates...')
+  translated_samples_no_duplicates = []
+  for sample in translated_samples:
+    if sample not in translated_samples_no_duplicates:
+      translated_samples_no_duplicates.append(sample)
+  print('Duplicates removed')
+  print('Total samples:', len(translated_samples_no_duplicates))
+  print()
+  
+  
   print('Saving unified samples at json...')
   json_file = os.path.join(game_dir, 'unified_samples.json')
   with open(json_file, 'w') as f:
-    json.dump(translated_samples, f)    
+    json.dump(translated_samples_no_duplicates, f)    
   print('Unified samples saved at json')
   print()
   return samples
