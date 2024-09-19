@@ -50,6 +50,7 @@ parser.add_argument('--jsonID', default=None, help='json file with class labels 
 
 parser.add_argument('--problem', type=int, default=0, help='Level examples')
 parser.add_argument('--tiles', type=int, default=13, help='Number of tile types')
+parser.add_argument('--game', help='The game to create a database for', choices=['zelda', 'mario'], default='mario')
 opt = parser.parse_args()
 print(opt)
 
@@ -98,7 +99,13 @@ print ("SHAPE ",X_onehot.shape)
 
 X_train = np.zeros ( (X.shape[0], z_dims, map_size, map_size) )*2
 
-X_train[:, 2, :, :] = 1.0  #Fill with empty space
+if opt.game == 'mario':
+    X_train[:, 2, :, :] = 1.0  #Fill with empty space
+elif opt.game == 'zelda':
+    X_train[:, 3, :, :] = 1.0
+else:
+    print("Unknown game: ", opt.game)
+    exit()
 
 #Pad part of level so its a square
 X_train[:X.shape[0], :, :X.shape[1], :X.shape[2]] = X_onehot
