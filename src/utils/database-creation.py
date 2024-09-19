@@ -1,6 +1,7 @@
 import os
 import argparse
 import json
+import numpy as np
 
 parser = argparse.ArgumentParser(description='Create a database from a directory of samples')
 parser.add_argument('--game', help='The game to create a database for', choices=['zelda', 'mario'], default='mario')
@@ -84,16 +85,28 @@ def unify_and_translate_mario_samples(game_dir):
   print('Samples translated')
   print()
   
+  print('Saving translated samples...')
+  json_file = os.path.join(game_dir, 'translated_samples.json')
+  with open(json_file, 'w') as f:
+    json.dump(translated_samples, f)
+  print('Translated samples saved')
+  print()
+  
   print('Concatenating samples...')
-  for i in range(len(translated_samples)):
-    translated_samples[i] = [item for sublist in translated_samples[i] for item in sublist]
+  concatenated_samples = []
+  for sample in translated_samples:
+    concatenated_sample = []
+    for split in sample: 
+      concatenated_sample.append(split)
+    for s in concatenated_sample:
+      concatenated_samples.append(s)
   print('Samples concatenated')
   print()
   
   print('Saving unified samples at json...')
   json_file = os.path.join(game_dir, 'unified_samples.json')
   with open(json_file, 'w') as f:
-    json.dump(translated_samples, f)    
+    json.dump(concatenated_samples, f)    
   print('Unified samples saved at json')
   print()
   return samples
