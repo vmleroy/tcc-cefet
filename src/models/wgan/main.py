@@ -16,6 +16,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import math
+import time
 
 import dcgan
 import json
@@ -57,6 +58,9 @@ print(opt)
 if opt.experiment is None:
     opt.experiment = 'experiment'
 os.system('mkdir {0}'.format(opt.experiment))
+os.system('mkdir {0}/fake_samples'.format(opt.experiment))
+os.system('mkdir {0}/performance'.format(opt.experiment))
+os.system('mkdir {0}/pths'.format(opt.experiment))
 
 opt.manualSeed = random.randint(1, 10000) # fix seed
 print("Random Seed: ", opt.manualSeed)
@@ -207,7 +211,9 @@ else:
     optimizerD = optim.RMSprop(netD.parameters(), lr = opt.lrD)
     optimizerG = optim.RMSprop(netG.parameters(), lr = opt.lrG)
 
+time_start = time.time()
 gen_iterations = 0
+errD_arr, errG_arr = [], []
 for epoch in range(opt.niter):    
     #X_train = X_train[torch.randperm( len(X_train) )]
     #ds = ds[torch.randperm( len(ds) )]
@@ -321,8 +327,7 @@ for epoch in range(opt.niter):
         print('[%d/%d][%d/%d][%d] Loss_D: %f Loss_G: %f Loss_D_real: %f Loss_D_fake %f'
             % (epoch, opt.niter, i, num_batches, gen_iterations,
             errD.data[0], errG.data[0], errD_real.data[0], errD_fake.data[0]))
-        if gen_iterations % 50 == 0:   #was 500
-
+        if gen_iterations % 500 == 0:   #was 500
             if opt.num_classes > 0: # Conditional GAN
                 randLabelNums = (torch.rand(opt.batchSize, 1) * opt.num_classes).type(torch.LongTensor).squeeze()
                 randLabel = onehot[randLabelNums]
@@ -335,11 +340,43 @@ for epoch in range(opt.niter):
             print('SHAPE fake',type(im), im.shape)
             print('SUM ',np.sum( im, axis = 1) )
 
-            # im = combine_images( tiles2image( np.argmax( im, axis = 1) ) )
-
-            # plt.imsave('{0}/fake_samples_{1}.png'.format(opt.experiment, gen_iterations), im)
+            im = combine_images( tiles2image( np.argmax( im, axis = 1) ) )
+            plt.imsave('{0}/fake_samples_{1}.png'.format(opt.experiment, gen_iterations), im)
+            
             torch.save(netG.state_dict(), '{0}/netG_epoch_{1}_{2}_{3}.pth'.format(opt.experiment, gen_iterations, opt.problem, opt.nz))
+            
+            errD_arr.append(errD.cpu().data.numpy())
+            errG_arr.append(errG.cpu().data.numpy())
 
     # do checkpointing
     #torch.save(netG.state_dict(), '{0}/netG_epoch_{1}.pth'.format(opt.experiment, epoch))
     #torch.save(netD.state_dict(), '{0}/netD_epoch_{1}.pth'.format(opt.experiment, epoch))
+
+plt.plot(errD_arr, label='Discriminator Loss')
+plt.plot(errG_arr, label='Generator Loss')
+plt.legend()
+plt.savefig('{0}/performance/losses.png'.format(opt.experiment))
+
+time_end = time.time()
+print("Time taken: ", time_end - time_start)
+
+with open('{0}/performance.txt'.format(opt.experiment), 'w') as f:
+    f.write("Time taken: {}\n".format(time_end - time_start))
+    # f.write("Total iterations: {}\n".format(gen_iterations))
+    # f.write("Total epochs: {}\n".format(epoch))
+    # f.write("Final D loss: {}\n".format(errD.data[0]))
+    # f.write("Final G loss: {}\n".format(errG.data[0]))
+    # f.write("Final D real loss: {}\n".format(errD_real.data[0]))
+    # f.write("Final D fake loss: {}\n".format(errD_fake.data[0]))
+
+    # f.write("Options: {}\n".format(opt))
+    # f.write("NetG: {}\n".format(netG))
+    # f.write("NetD: {}\n".format(netD))
+    # f.write("OptimizerG: {}\n".format(optimizerG))
+    # f.write("OptimizerD: {}\n".format(optimizerD))
+
+    # f.write("Data: {}\n".format(X_train))
+    # f.write("Data shape: {}\n".format(X_train.shape))
+    # f.write("Data type: {}\n".format(type(X_train)))
+    # f.write("Data type type: {}\n".format(type(type(X_train))))
+    # f.write("Data type type type: {}\n".format(type(type(type(X_train)))))
