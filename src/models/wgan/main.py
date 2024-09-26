@@ -341,9 +341,9 @@ for epoch in range(opt.niter):
             print('SUM ',np.sum( im, axis = 1) )
 
             im = combine_images( tiles2image( np.argmax( im, axis = 1) ) )
-            plt.imsave('{0}/fake_samples_{1}.png'.format(opt.experiment, gen_iterations), im)
+            plt.imsave('{0}/fake_samples/fake_samples_{1}.png'.format(opt.experiment, gen_iterations), im)
             
-            torch.save(netG.state_dict(), '{0}/netG_epoch_{1}_{2}_{3}.pth'.format(opt.experiment, gen_iterations, opt.problem, opt.nz))
+            torch.save(netG.state_dict(), '{0}/pths/netG_epoch_{1}_{2}_{3}.pth'.format(opt.experiment, gen_iterations, opt.problem, opt.nz))
             
             errD_arr.append(errD.cpu().data.numpy())
             errG_arr.append(errG.cpu().data.numpy())
@@ -360,7 +360,7 @@ plt.savefig('{0}/performance/losses.png'.format(opt.experiment))
 time_end = time.time()
 print("Time taken: ", time_end - time_start)
 
-with open('{0}/performance.txt'.format(opt.experiment), 'w') as f:
+with open('{0}/performance/performance.txt'.format(opt.experiment), 'w') as f:
     f.write("Time taken: {}\n".format(time_end - time_start))
     # f.write("Total iterations: {}\n".format(gen_iterations))
     # f.write("Total epochs: {}\n".format(epoch))
