@@ -39,6 +39,7 @@ parser.add_argument('--netD', default='', help="path to netD (to continue traini
 parser.add_argument('--clamp_lower', type=float, default=-0.01)
 parser.add_argument('--clamp_upper', type=float, default=0.01)
 parser.add_argument('--Diters', type=int, default=5, help='number of D iters per each G iter')
+parser.add_argument('--num_classes', type=int, default=0,  help='Number of conditional GAN classes. Default of 0 means cGAN is not used.')
 
 parser.add_argument('--n_extra_layers', type=int, default=0, help='Number of extra layers on gen and disc')
 parser.add_argument('--experiment', default=None, help='Where to store samples and models')
