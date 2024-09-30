@@ -40,8 +40,6 @@ parser.add_argument('--clamp_lower', type=float, default=-0.01)
 parser.add_argument('--clamp_upper', type=float, default=0.01)
 parser.add_argument('--Diters', type=int, default=5, help='number of D iters per each G iter')
 
-parser.add_argument('--num_classes', type=int, default=0,  help='Number of conditional GAN classes. Default of 0 means cGAN is not used.')
-
 parser.add_argument('--n_extra_layers', type=int, default=0, help='Number of extra layers on gen and disc')
 parser.add_argument('--experiment', default=None, help='Where to store samples and models')
 parser.add_argument('--adam', action='store_true', help='Whether to use adam (default is rmsprop)')
@@ -213,7 +211,7 @@ else:
 
 time_start = time.time()
 gen_iterations = 0
-errD_arr, errG_arr = [], []
+errD_arr, errD_fake_arr, errD_real_arr ,errG_arr = [], [], [], []
 for epoch in range(opt.niter):    
     #X_train = X_train[torch.randperm( len(X_train) )]
     #ds = ds[torch.randperm( len(ds) )]
@@ -298,6 +296,9 @@ for epoch in range(opt.niter):
             errD_fake.backward(mone)
             errD = errD_real - errD_fake
             optimizerD.step()
+            
+            errD_fake_arr.append(errD_fake.cpu().data.numpy())
+            errD_real_arr.append(errD_real.cpu().data.numpy())
 
         ############################
         # (2) Update G network
@@ -354,29 +355,35 @@ for epoch in range(opt.niter):
 
 plt.plot(errD_arr, label='Discriminator Loss')
 plt.plot(errG_arr, label='Generator Loss')
+plt.xlabel('Iterations')
+plt.ylabel('Loss')
 plt.legend()
 plt.savefig('{0}/performance/losses.png'.format(opt.experiment))
+plt.close()
+
+plt.plot(errD_fake_arr, label='Discriminator Fake Loss')
+plt.plot(errD_real_arr, label='Discriminator Real Loss')
+plt.xlabel('Iterations')
+plt.ylabel('Loss')
+plt.legend()
+plt.savefig('{0}/performance/losses2.png'.format(opt.experiment))
+plt.close()
 
 time_end = time.time()
 print("Time taken: ", time_end - time_start)
 
 with open('{0}/performance/performance.txt'.format(opt.experiment), 'w') as f:
-    f.write("Time taken: {}\n".format(time_end - time_start))
-    # f.write("Total iterations: {}\n".format(gen_iterations))
-    # f.write("Total epochs: {}\n".format(epoch))
-    # f.write("Final D loss: {}\n".format(errD.data[0]))
-    # f.write("Final G loss: {}\n".format(errG.data[0]))
-    # f.write("Final D real loss: {}\n".format(errD_real.data[0]))
-    # f.write("Final D fake loss: {}\n".format(errD_fake.data[0]))
+    f.write("Time taken: {}\n\n".format(time.gmtime(time_end - time_start)))
+    f.write("Total iterations: {}\n".format(gen_iterations))
+    f.write("Total epochs: {}\n\n".format(epoch))
 
-    # f.write("Options: {}\n".format(opt))
-    # f.write("NetG: {}\n".format(netG))
-    # f.write("NetD: {}\n".format(netD))
-    # f.write("OptimizerG: {}\n".format(optimizerG))
-    # f.write("OptimizerD: {}\n".format(optimizerD))
-
-    # f.write("Data: {}\n".format(X_train))
-    # f.write("Data shape: {}\n".format(X_train.shape))
-    # f.write("Data type: {}\n".format(type(X_train)))
-    # f.write("Data type type: {}\n".format(type(type(X_train))))
-    # f.write("Data type type type: {}\n".format(type(type(type(X_train)))))
+    f.write("Data shape: {}\n\n".format(X_train.shape))
+    
+    f.write("nz: {}\n".format(nz))
+    f.write("ngf: {}\n".format(ngf))
+    f.write("ndf: {}\n".format(ndf))
+    f.write("batchSize: {}\n".format(opt.batchSize))
+    f.write("niter: {}\n".format(opt.niter))
+    f.write("lrD: {}\n".format(opt.lrD))
+    f.write("lrG: {}\n".format(opt.lrG))
+    f.write("tiles: {}\n".format(opt.tiles))
