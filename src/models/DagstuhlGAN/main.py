@@ -1,6 +1,7 @@
 from __future__ import print_function
 import argparse
 import random
+import time
 import torch
 import torch.nn as nn
 import torch.nn.parallel
@@ -50,6 +51,10 @@ print(opt)
 if opt.experiment is None:
     opt.experiment = 'samples'
 os.system('mkdir {0}'.format(opt.experiment))
+os.system('mkdir {0}/samples'.format(opt.experiment))
+os.system('mkdir {0}/samples_txt'.format(opt.experiment))
+os.system('mkdir {0}/pths'.format(opt.experiment))
+os.system('mkdir {0}/logs'.format(opt.experiment))
 
 opt.manualSeed = random.randint(1, 10000) # fix seed
 print("Random Seed: ", opt.manualSeed)
@@ -154,6 +159,9 @@ else:
     optimizerD = optim.RMSprop(netD.parameters(), lr = opt.lrD)
     optimizerG = optim.RMSprop(netG.parameters(), lr = opt.lrG)
 
+errD_real_arr, errD_fake_arr, errD_epoch_arr, errG_epoch_arr, errD_gen_arr, errG_gen_arr = [], [], [], [], [], []
+time_start = time.time()
+
 gen_iterations = 0
 for epoch in range(opt.niter):
     
@@ -161,6 +169,7 @@ for epoch in range(opt.niter):
 
     X_train = X_train[torch.randperm( len(X_train) )]
 
+    temp_errG_epoch, temp_errG_epoch = [], []
     i = 0
     while i < num_batches:#len(dataloader):
         ############################
@@ -174,7 +183,9 @@ for epoch in range(opt.niter):
             Diters = 100
         else:
             Diters = opt.Diters
-        j = 0
+        
+        temp_errD_real, temp_errD_fake, temp_errD_gen, temp_errG_gen = [], [], [], []
+        j = 0        
         while j < Diters and i < num_batches:#len(dataloader):
             j += 1
 
@@ -217,7 +228,14 @@ for epoch in range(opt.niter):
             errD_fake.backward(mone)
             errD = errD_real - errD_fake
             optimizerD.step()
+            
+            temp_errD_fake.append(errD_fake.cpu().data.numpy())
+            temp_errD_real.append(errD_real.cpu().data.numpy())
+            temp_errG_epoch.append(errD.cpu().data.numpy())
 
+        errD_real_arr.append(np.mean(temp_errD_real))
+        errD_real_arr.append(np.mean(temp_errD_fake))
+        
         ############################
         # (2) Update G network
         ###########################
@@ -237,6 +255,10 @@ for epoch in range(opt.niter):
         print('[%d/%d][%d/%d][%d] Loss_D: %f Loss_G: %f Loss_D_real: %f Loss_D_fake %f'
             % (epoch, opt.niter, i, num_batches, gen_iterations,
             errD.data[0], errG.data[0], errD_real.data[0], errD_fake.data[0]))
+        
+        temp_errG_gen.append(errG.cpu().data.numpy())
+        temp_errD_gen.append(errD.cpu().data.numpy())
+        
         if gen_iterations % 500 == 0:   #was 500
 
             fake = netG(Variable(fixed_noise, volatile=True))
@@ -247,9 +269,57 @@ for epoch in range(opt.niter):
 
             im = combine_images( tiles2image( np.argmax( im, axis = 1) ) )
 
-            plt.imsave('{0}/mario_fake_samples_{1}.png'.format(opt.experiment, gen_iterations), im)
-            torch.save(netG.state_dict(), '{0}/netG_epoch_{1}_{2}_{3}.pth'.format(opt.experiment, gen_iterations, opt.problem, opt.nz))
+            plt.imsave('{0}/samples/fake_samples_{1}.png'.format(opt.experiment, gen_iterations), im)
+            
+            with open('{0}/samples_txt/fake_samples_{1}.txt'.format(opt.experiment, gen_iterations), 'w') as f:
+                text_im = fake.data.cpu().numpy()
+                text_im = np.argmax(text_im, axis = 1)
+                
+                for images in text_im:
+                    for row in images:
+                        for tile in row:
+                            f.write(str(tile) + ' ')
+                        f.write('\n')
+                    f.write('\n\n\n')
+            
+            torch.save(netG.state_dict(), '{0}/pths/netG_epoch_{1}_{2}_{3}.pth'.format(opt.experiment, gen_iterations, opt.problem, opt.nz))
+            
+    errD_epoch_arr.append(np.mean(temp_errG_epoch))
+    errG_epoch_arr.append(np.mean(temp_errG_epoch))
 
     # do checkpointing
     #torch.save(netG.state_dict(), '{0}/netG_epoch_{1}.pth'.format(opt.experiment, epoch))
     #torch.save(netD.state_dict(), '{0}/netD_epoch_{1}.pth'.format(opt.experiment, epoch))
+    
+time_end = time.time()
+
+plt.plot(errD_epoch_arr)
+plt.plot(errG_epoch_arr)
+plt.legend(['Discriminator', 'Generator'])
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.show()
+plt.savefig('{0}/logs/losses_per_epoch.png'.format(opt.experiment))
+plt.close()
+
+plt.plot(errD_gen_arr)
+plt.plot(errG_gen_arr)
+plt.legend(['Discriminator', 'Generator'])
+plt.xlabel('Generations / 500')
+plt.ylabel('Loss')
+plt.show()
+plt.savefig('{0}/logs/losses_per_500_gen.png'.format(opt.experiment))
+plt.close()
+
+plt.plot(errD_real_arr)
+plt.plot(errD_fake_arr)
+plt.legend(['Real', 'Fake'])
+plt.xlabel('Generation')
+plt.ylabel('Loss')
+plt.show()
+plt.savefig('{0}/logs/discriminator_losses_per_gen.png'.format(opt.experiment))
+plt.close()
+
+with open('{0}/logs/params.txt'.format(opt.experiment), 'w') as f:
+    f.write(str(opt))
+    f.write('\n\nTime taken: ' + str(time_end - time_start))

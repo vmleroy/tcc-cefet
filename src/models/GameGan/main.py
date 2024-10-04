@@ -304,9 +304,9 @@ for epoch in range(opt.niter):
             errD = errD_real - errD_fake
             optimizerD.step()
             
-            temp_errD_fake.append(errD_fake.data[0])
-            temp_errD_real.append(errD_real.data[0])
-            temp_errG_epoch.append(errD.data[0])
+            temp_errD_fake.append(errD_fake.cpu().data.numpy())
+            temp_errD_real.append(errD_real.cpu().data.numpy())
+            temp_errG_epoch.append(errD.cpu().data.numpy())
             
         errD_real_arr.append(np.mean(temp_errD_real))
         errD_real_arr.append(np.mean(temp_errD_fake))
@@ -340,8 +340,8 @@ for epoch in range(opt.niter):
             % (epoch, opt.niter, i, num_batches, gen_iterations,
             errD.data[0], errG.data[0], errD_real.data[0], errD_fake.data[0]))
         
-        temp_errG_gen.append(errG.data[0])
-        temp_errD_gen.append(errD.data[0])
+        temp_errG_gen.append(errG.cpu().data.numpy())
+        temp_errD_gen.append(errD.cpu().data.numpy())
         
         if gen_iterations % 500 == 0:   #was 500
             if opt.num_classes > 0: # Conditional GAN
@@ -357,17 +357,21 @@ for epoch in range(opt.niter):
             #print('SUM ',np.sum( im, axis = 1) )
 
             im = combine_images( tiles2image( np.argmax( im, axis = 1) ) )
-
             plt.imsave('{0}/samples/fake_samples_{1}.png'.format(opt.experiment, gen_iterations), im)
             
             errD_gen_arr.append(np.mean(temp_errD_gen))
             errG_gen_arr.append(np.mean(temp_errG_gen))
             
-            with open('{0}/samples_txt/fake_samples_{1}.txt'.format(opt.experiment), 'w') as f:
-                for i in range(im.shape[0]):
-                    for j in range(im.shape[1]):
-                        f.write(str(im[i,j]) + ' ')
-                    f.write('\n')
+            with open('{0}/samples_txt/fake_samples_{1}.txt'.format(opt.experiment, gen_iterations), 'w') as f:
+                text_im = fake.data.cpu().numpy()
+                text_im = np.argmax(text_im, axis = 1)
+                
+                for images in text_im:
+                    for row in images:
+                        for tile in row:
+                            f.write(str(tile) + ' ')
+                        f.write('\n')
+                    f.write('\n\n\n')
             
             torch.save(netG.state_dict(), '{0}/pths/netG_epoch_{1}_{2}_{3}.pth'.format(opt.experiment, gen_iterations, opt.problem, opt.nz))
 
@@ -385,7 +389,6 @@ plt.plot(errG_epoch_arr)
 plt.legend(['Discriminator', 'Generator'])
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
-plt.show()
 plt.savefig('{0}/logs/losses_per_epoch.png'.format(opt.experiment))
 plt.close()
 
@@ -394,7 +397,6 @@ plt.plot(errG_gen_arr)
 plt.legend(['Discriminator', 'Generator'])
 plt.xlabel('Generations / 500')
 plt.ylabel('Loss')
-plt.show()
 plt.savefig('{0}/logs/losses_per_500_gen.png'.format(opt.experiment))
 plt.close()
 
@@ -403,7 +405,6 @@ plt.plot(errD_fake_arr)
 plt.legend(['Real', 'Fake'])
 plt.xlabel('Generation')
 plt.ylabel('Loss')
-plt.show()
 plt.savefig('{0}/logs/discriminator_losses_per_gen.png'.format(opt.experiment))
 plt.close()
 
