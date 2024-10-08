@@ -231,10 +231,11 @@ for epoch in range(opt.niter):
             
             temp_errD_fake.append(errD_fake.cpu().data.numpy())
             temp_errD_real.append(errD_real.cpu().data.numpy())
-            temp_errG_epoch.append(errD.cpu().data.numpy())
-
+            
+        errD_fake_arr.append(np.mean(temp_errD_fake))
         errD_real_arr.append(np.mean(temp_errD_real))
-        errD_real_arr.append(np.mean(temp_errD_fake))
+        temp_errD_fake = []
+        temp_errD_real = []
         
         ############################
         # (2) Update G network
@@ -256,8 +257,10 @@ for epoch in range(opt.niter):
             % (epoch, opt.niter, i, num_batches, gen_iterations,
             errD.data[0], errG.data[0], errD_real.data[0], errD_fake.data[0]))
         
-        temp_errG_gen.append(errG.cpu().data.numpy())
         temp_errD_gen.append(errD.cpu().data.numpy())
+        temp_errG_gen.append(errG.cpu().data.numpy())
+        temp_errD_epoch.append(errD.cpu().data.numpy())
+        temp_errG_epoch.append(errG.cpu().data.numpy())
         
         if gen_iterations % 500 == 0:   #was 500
 
@@ -271,21 +274,27 @@ for epoch in range(opt.niter):
 
             plt.imsave('{0}/samples/fake_samples_{1}.png'.format(opt.experiment, gen_iterations), im)
             
-            with open('{0}/samples_txt/fake_samples_{1}.txt'.format(opt.experiment, gen_iterations), 'w') as f:
-                text_im = fake.data.cpu().numpy()
-                text_im = np.argmax(text_im, axis = 1)
+            errD_gen_arr.append(np.mean(temp_errD_gen))
+            errG_gen_arr.append(np.mean(temp_errG_gen))            
+            temp_errD_gen = []
+            temp_errG_gen = []
+            
+            text_im = fake.data.cpu().numpy()
+            text_im = np.argmax(text_im, axis = 1)
                 
-                for images in text_im:
+            for index, images in enumerate(text_im):
+                with open('{0}/samples_txt/fake_samples_{1}_{2}.txt'.format(opt.experiment, gen_iterations, index), 'w') as f:
                     for row in images:
                         for tile in row:
                             f.write(str(tile) + ' ')
                         f.write('\n')
-                    f.write('\n\n\n')
             
             torch.save(netG.state_dict(), '{0}/pths/netG_epoch_{1}_{2}_{3}.pth'.format(opt.experiment, gen_iterations, opt.problem, opt.nz))
             
-    errD_epoch_arr.append(np.mean(temp_errG_epoch))
+    errD_epoch_arr.append(np.mean(temp_errD_epoch))
     errG_epoch_arr.append(np.mean(temp_errG_epoch))
+    temp_errD_epoch = []
+    temp_errG_epoch = []
 
     # do checkpointing
     #torch.save(netG.state_dict(), '{0}/netG_epoch_{1}.pth'.format(opt.experiment, epoch))
@@ -293,13 +302,46 @@ for epoch in range(opt.niter):
     
 time_end = time.time()
 
+'''
+# Discriminator x Generator loss per epoch
+'''
+plt.plot(errD_epoch_arr)
+plt.legend(['Discriminator'])
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.savefig('{0}/logs/discriminator_losses_per_epoch.png'.format(opt.experiment))
+plt.close()
+
+plt.plot(errG_epoch_arr)
+plt.legend(['Generator'])
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.savefig('{0}/logs/generator_losses_per_epoch.png'.format(opt.experiment))
+plt.close()
+
 plt.plot(errD_epoch_arr)
 plt.plot(errG_epoch_arr)
 plt.legend(['Discriminator', 'Generator'])
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
-plt.show()
-plt.savefig('{0}/logs/losses_per_epoch.png'.format(opt.experiment))
+plt.savefig('{0}/logs/discriminator_generator_losses_per_epoch.png'.format(opt.experiment))
+plt.close()
+
+'''
+# Discriminator x Generator loss per 500 generations
+'''
+plt.plot(errD_gen_arr)
+plt.legend(['Discriminator'])
+plt.xlabel('Generations / 500')
+plt.ylabel('Loss')
+plt.savefig('{0}/logs/discriminator_losses_per_500_gen.png'.format(opt.experiment))
+plt.close()
+
+plt.plot(errG_gen_arr)
+plt.legend(['Generator'])
+plt.xlabel('Generations / 500')
+plt.ylabel('Loss')
+plt.savefig('{0}/logs/generator_losses_per_500_gen.png'.format(opt.experiment))
 plt.close()
 
 plt.plot(errD_gen_arr)
@@ -307,8 +349,24 @@ plt.plot(errG_gen_arr)
 plt.legend(['Discriminator', 'Generator'])
 plt.xlabel('Generations / 500')
 plt.ylabel('Loss')
-plt.show()
-plt.savefig('{0}/logs/losses_per_500_gen.png'.format(opt.experiment))
+plt.savefig('{0}/logs/discriminator_generator_losses_per_500_gen.png'.format(opt.experiment))
+plt.close()
+
+'''
+# Discriminator loss (Real and Fake)
+'''
+plt.plot(errD_real_arr)
+plt.legend(['Real'])
+plt.xlabel('Generation')
+plt.ylabel('Loss')
+plt.savefig('{0}/logs/real_discriminator_losses_per_gen.png'.format(opt.experiment))
+plt.close()
+
+plt.plot(errD_fake_arr)
+plt.legend(['Fake'])
+plt.xlabel('Generation')
+plt.ylabel('Loss')
+plt.savefig('{0}/logs/fake_discriminator_losses_per_gen.png'.format(opt.experiment))
 plt.close()
 
 plt.plot(errD_real_arr)
@@ -316,10 +374,10 @@ plt.plot(errD_fake_arr)
 plt.legend(['Real', 'Fake'])
 plt.xlabel('Generation')
 plt.ylabel('Loss')
-plt.show()
-plt.savefig('{0}/logs/discriminator_losses_per_gen.png'.format(opt.experiment))
+plt.savefig('{0}/logs/real_fake_discriminator_losses_per_gen.png'.format(opt.experiment))
 plt.close()
 
 with open('{0}/logs/params.txt'.format(opt.experiment), 'w') as f:
-    f.write(str(opt))
-    f.write('\n\nTime taken: ' + str(time_end - time_start))
+    for arg in vars(opt):
+        f.write(arg + ': ' + str(getattr(opt, arg)) + '\n')
+    f.write('\n\nTime taken: ' + time.strftime("%H:%M:%S", time.gmtime(time_end - time_start)))
