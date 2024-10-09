@@ -45,6 +45,8 @@ parser.add_argument('--n_extra_layers', type=int, default=0, help='Number of ext
 parser.add_argument('--experiment', default=None, help='Where to store samples and models')
 parser.add_argument('--adam', action='store_true', help='Whether to use adam (default is rmsprop)')
 parser.add_argument('--problem', type=int, default=0, help='Level examples')
+parser.add_argument('--tiles', type=int, default=13, help='Number of tile types')
+parser.add_argument('--json', default=None, help='Json file with example levels')
 opt = parser.parse_args()
 print(opt)
 
@@ -68,14 +70,18 @@ if torch.cuda.is_available() and not opt.cuda:
  
 map_size = 32
 
-if opt.problem == 0:
-    examplesJson = "example.json"
+if opt.json is None:
+    if opt.problem == 0:
+        examplesJson = "example.json"
+    else:
+        examplesJson = "sepEx/examplemario{}.json".format(opt.problem)
 else:
-    examplesJson= "sepEx/examplemario{}.json".format(opt.problem)
+    examplesJson = opt.json
+    
 X = np.array ( json.load(open(examplesJson)) )
 print(X)
 print(X.shape)
-z_dims = 10 #Numer different title types
+z_dims = opt.tiles #Numer different title types
 
 num_batches = X.shape[0] / opt.batchSize
 
@@ -159,17 +165,18 @@ else:
     optimizerD = optim.RMSprop(netD.parameters(), lr = opt.lrD)
     optimizerG = optim.RMSprop(netG.parameters(), lr = opt.lrG)
 
-errD_real_arr, errD_fake_arr, errD_epoch_arr, errG_epoch_arr, errD_gen_arr, errG_gen_arr = [], [], [], [], [], []
+errD_real_arr, errD_fake_arr, errD_epoch_arr, errG_epoch_arr, errD_gen_arr, errG_gen_arr = np.array([]), np.array([]), np.array([]), np.array([]), np.array([]), np.array([])
 time_start = time.time()
 
 gen_iterations = 0
+temp_errD_gen, temp_errG_gen = np.array([]), np.array([])
 for epoch in range(opt.niter):
     
     #! data_iter = iter(dataloader)
 
     X_train = X_train[torch.randperm( len(X_train) )]
 
-    temp_errG_epoch, temp_errG_epoch = [], []
+    temp_errD_epoch, temp_errG_epoch = np.array([]), np.array([])
     i = 0
     while i < num_batches:#len(dataloader):
         ############################
@@ -184,7 +191,7 @@ for epoch in range(opt.niter):
         else:
             Diters = opt.Diters
         
-        temp_errD_real, temp_errD_fake, temp_errD_gen, temp_errG_gen = [], [], [], []
+        temp_errD_real, temp_errD_fake  = np.array([]), np.array([])
         j = 0        
         while j < Diters and i < num_batches:#len(dataloader):
             j += 1
@@ -229,13 +236,11 @@ for epoch in range(opt.niter):
             errD = errD_real - errD_fake
             optimizerD.step()
             
-            temp_errD_fake.append(errD_fake.cpu().data.numpy())
-            temp_errD_real.append(errD_real.cpu().data.numpy())
-            
-        errD_fake_arr.append(np.mean(temp_errD_fake))
-        errD_real_arr.append(np.mean(temp_errD_real))
-        temp_errD_fake = []
-        temp_errD_real = []
+            temp_errD_fake = np.append(temp_errD_fake, errD_fake.cpu().data.numpy())
+            temp_errD_real = np.append(temp_errD_real, errD_real.cpu().data.numpy())
+        
+        errD_fake_arr = np.append(errD_fake_arr, np.mean(temp_errD_fake))
+        errD_real_arr = np.append(errD_real_arr, np.mean(temp_errD_real))
         
         ############################
         # (2) Update G network
@@ -257,10 +262,10 @@ for epoch in range(opt.niter):
             % (epoch, opt.niter, i, num_batches, gen_iterations,
             errD.data[0], errG.data[0], errD_real.data[0], errD_fake.data[0]))
         
-        temp_errD_gen.append(errD.cpu().data.numpy())
-        temp_errG_gen.append(errG.cpu().data.numpy())
-        temp_errD_epoch.append(errD.cpu().data.numpy())
-        temp_errG_epoch.append(errG.cpu().data.numpy())
+        temp_errD_gen = np.append(temp_errD_gen, errD.cpu().data.numpy())
+        temp_errG_gen = np.append(temp_errG_gen, errG.cpu().data.numpy())
+        temp_errD_epoch = np.append(temp_errD_epoch, errD.cpu().data.numpy())
+        temp_errG_epoch = np.append(temp_errG_epoch, errG.cpu().data.numpy())
         
         if gen_iterations % 500 == 0:   #was 500
 
@@ -271,13 +276,12 @@ for epoch in range(opt.niter):
             #print('SUM ',np.sum( im, axis = 1) )
 
             im = combine_images( tiles2image( np.argmax( im, axis = 1) ) )
-
             plt.imsave('{0}/samples/fake_samples_{1}.png'.format(opt.experiment, gen_iterations), im)
             
-            errD_gen_arr.append(np.mean(temp_errD_gen))
-            errG_gen_arr.append(np.mean(temp_errG_gen))            
-            temp_errD_gen = []
-            temp_errG_gen = []
+            errD_gen_arr = np.append(errD_gen_arr, np.mean(temp_errD_gen))
+            errG_gen_arr = np.append(errG_gen_arr, np.mean(temp_errG_gen))         
+            temp_errD_gen = np.array([])
+            temp_errG_gen = np.array([])
             
             text_im = fake.data.cpu().numpy()
             text_im = np.argmax(text_im, axis = 1)
@@ -291,16 +295,30 @@ for epoch in range(opt.niter):
             
             torch.save(netG.state_dict(), '{0}/pths/netG_epoch_{1}_{2}_{3}.pth'.format(opt.experiment, gen_iterations, opt.problem, opt.nz))
             
-    errD_epoch_arr.append(np.mean(temp_errD_epoch))
-    errG_epoch_arr.append(np.mean(temp_errG_epoch))
-    temp_errD_epoch = []
-    temp_errG_epoch = []
+    errD_epoch_arr = np.append(errD_epoch_arr, np.mean(temp_errD_epoch))
+    errG_epoch_arr = np.append(errG_epoch_arr, np.mean(temp_errG_epoch))
+    temp_errD_epoch = np.array([])
+    temp_errG_epoch = np.array([])
 
     # do checkpointing
     #torch.save(netG.state_dict(), '{0}/netG_epoch_{1}.pth'.format(opt.experiment, epoch))
     #torch.save(netD.state_dict(), '{0}/netD_epoch_{1}.pth'.format(opt.experiment, epoch))
     
 time_end = time.time()
+
+errD_gen_arr = errD_gen_arr[~np.isnan(errD_gen_arr)]
+errG_gen_arr = errG_gen_arr[~np.isnan(errG_gen_arr)]
+errD_real_arr = errD_real_arr[~np.isnan(errD_real_arr)]
+errD_fake_arr = errD_fake_arr[~np.isnan(errD_fake_arr)]
+errD_epoch_arr = errD_epoch_arr[~np.isnan(errD_epoch_arr)]
+errG_epoch_arr = errG_epoch_arr[~np.isnan(errG_epoch_arr)]
+
+print('Time taken: ' + time.strftime("%H:%M:%S", time.gmtime(time_end - time_start)), '\n\n\n')
+print('Error D (real / fake): ', errD_real_arr, '\n', errD_fake_arr, '\n\n\n')
+print('Error D: ', errD_gen_arr, '\n\n\n')
+print('Error G: ', errG_gen_arr, '\n\n\n')
+print('Error D per Epoch: ', errD_epoch_arr, '\n\n\n')
+print('Error G per Epoch: ', errG_epoch_arr, '\n\n\n')
 
 '''
 # Discriminator x Generator loss per epoch
