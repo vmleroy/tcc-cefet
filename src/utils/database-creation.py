@@ -10,55 +10,6 @@ opt = parser.parse_args()
 ##
 # MARIO HELP FUNCTIONS
 ##
-def generate_mario_samples(files):
-  width = 28
-  height = 14
-  
-  samples = {}
-  samples_count = 0
-  
-  for file in files:
-    level = []
-    splits_count = 0
-    with open(file, 'r') as f:
-      print(f'Processing {file}...')
-      mario_map = f.read().splitlines()
-      
-      print(f'File rows: {len(mario_map)}, File columns: {len(mario_map[0])}')
-      
-      splits_per_width = int(len(mario_map[0]) / width)
-      print(f'Splits per width: {splits_per_width}') 
-      
-      print('Generating samples...')
-      for x in range(splits_per_width):
-        split = []
-        for i in range(height):
-          row = []
-          for j in range(width):
-            row.append(mario_map[i][x * width + j])
-          split.append(row)
-        level.append(split)
-        splits_count += 1
-        print('\tSplits:', splits_count)
-      samples[file] = level
-        
-    samples_count += splits_count
-    print()
-    
-  print('Total samples:', samples_count)
-  print('Saving samples...')
-  dir_name = 'src/data/mario/samples'
-  if not os.path.exists(dir_name):
-    print('\tCreating directory:', dir_name)
-    os.mkdir(dir_name)
-    print('\tDirectory created')
-  for file, level in samples.items():
-    json_file = f'{dir_name}/{file.split("/")[-1].replace(".txt", "")}.json'
-    with open(json_file, 'w') as f:
-      json.dump(level, f)
-  print('Samples saved')
-  print()
-
 def unify_and_translate_mario_samples(game_dir):
   print('Loading samples...')
   samples = []
@@ -111,6 +62,103 @@ def unify_and_translate_mario_samples(game_dir):
   print()
   return samples
 
+def generate_mario_samples_v1(files):
+  width = 28
+  height = 14
+  
+  samples = {}
+  samples_count = 0
+  
+  for file in files:
+    level = []
+    splits_count = 0
+    with open(file, 'r') as f:
+      print(f'Processing {file}...')
+      mario_map = f.read().splitlines()
+      
+      print(f'File rows: {len(mario_map)}, File columns: {len(mario_map[0])}')
+      
+      splits_per_width = int(len(mario_map[0]) / width)
+      print(f'Splits per width: {splits_per_width}') 
+      
+      print('Generating samples...')
+      for x in range(splits_per_width):
+        split = []
+        for i in range(height):
+          row = []
+          for j in range(width):
+            row.append(mario_map[i][x * width + j])
+          split.append(row)
+        level.append(split)
+        splits_count += 1
+        print('\tSplits:', splits_count)
+      samples[file] = level
+        
+    samples_count += splits_count
+    print()
+    
+  print('Total samples:', samples_count)
+  print('Saving samples...')
+  dir_name = 'src/data/mario/samples'
+  if not os.path.exists(dir_name):
+    print('\tCreating directory:', dir_name)
+    os.mkdir(dir_name)
+    print('\tDirectory created')
+  for file, level in samples.items():
+    json_file = f'{dir_name}/{file.split("/")[-1].replace(".txt", "")}.json'
+    with open(json_file, 'w') as f:
+      json.dump(level, f)
+  print('Samples saved')
+  print()
+
+def generate_mario_samples(files):
+  width = 28
+  height = 14
+  
+  samples = {}
+  samples_count = 0
+  
+  for file in files:
+    level = []
+    splits_count = 0
+    with open(file, 'r') as f:
+      print(f'Processing {file}...')
+      mario_map = f.read().splitlines()
+      
+      print(f'File rows: {len(mario_map)}, File columns: {len(mario_map[0])}')
+      
+      print('Generating samples...')
+      column = 0
+      while column < len(mario_map[0]) - width:
+        split = []
+        for i in range(height):
+          row = []
+          for j in range(width):
+            row.append(mario_map[i][column + j])
+          split.append(row)
+        level.append(split)
+        splits_count += 1
+        column += 1
+        print('\tSplits:', splits_count)
+      samples[file] = level
+        
+    samples_count += splits_count
+    print()
+    
+  print('Total samples:', samples_count)
+  print('Saving samples...')
+  dir_name = 'src/data/mario/samples'
+  if not os.path.exists(dir_name):
+    print('\tCreating directory:', dir_name)
+    os.mkdir(dir_name)
+    print('\tDirectory created')
+  for file, level in samples.items():
+    json_file = f'{dir_name}/{file.split("/")[-1].replace(".txt", "")}.json'
+    with open(json_file, 'w') as f:
+      json.dump(level, f)
+  print('Samples saved')
+  print()
+  
 
 ###
 # ZELDA HELP FUNCTIONS

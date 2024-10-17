@@ -1,0 +1,24 @@
+dataset: src/data/mario/unified_samples.json
+experiment: src/data/mario/results/db-mine_nz-32_tiles-10_ngf-64_ndf-64_wgan-mine_v-2
+tiles: 10
+batchSize: 32
+nz: 32
+ngf: 64
+ndf: 64
+niter: 5000
+Diters: 5
+lrD: 5e-05
+lrG: 5e-05
+beta1: 0.5
+cuda: True
+ngpu: 1
+netG: 
+netD: 
+clamp_lower: -0.01
+clamp_upper: 0.01
+n_extra_layers: 0
+adam: False
+manualSeed: 2600
+
+
+Time taken: 00:36:09
