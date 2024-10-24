@@ -1,63 +1,71 @@
-from __future__ import print_function
+# This generator program expands a low-dimentional latent vector into a 2D array of tiles.
+# Each line of input should be an array of z vectors (which are themselves arrays of floats -1 to 1)
+# Each line of output is an array of 32 levels (which are arrays-of-arrays of integer tile ids)
+
 import argparse
-import random
+import os
+import numpy
+
 import torch
-import torch.nn as nn
-import torch.nn.parallel
-import torch.backends.cudnn as cudnn
-import torch.optim as optim
-import torch.utils.data
-import torchvision.datasets as dset
-import torchvision.transforms as transforms
 import torchvision.utils as vutils
 from torch.autograd import Variable
-import os
-import json
 
 import models.dcgan as dcgan
-import models.mlp as mlp
 
-if __name__=="__main__":
+parser = argparse.ArgumentParser()
+parser.add_argument('--game', help='The game to generate samples on', choices=['mario', 'zelda'])
+parser.add_argument('--tiles', type=int, default=10, help='The number of tiles in the game')
+parser.add_argument('--modelToLoad', default=32, help='The object to load the generator from')
+parser.add_argument('--experiment', help='Where to store the result of the experiment')
+parser.add_argument('--batchSize', type=int, default=1, help='Batch size')
+parser.add_argument('--nz', type=int, default=32, help='size of the latent z vector')
+parser.add_argument('--ngf', type=int, default=64)
+parser.add_argument('--n_extra_layers', type=int, default=0)
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config', required=True, type=str, help='path to generator config .json file')
-    parser.add_argument('-w', '--weights', required=True, type=str, help='path to generator weights .pth file')
-    parser.add_argument('-o', '--output_dir', required=True, type=str, help="path to to output directory")
-    parser.add_argument('-n', '--nimages', required=True, type=int, help="number of images to generate", default=1)
-    parser.add_argument('--cuda', action='store_true', help='enables cuda')
-    opt = parser.parse_args()
+opt = parser.parse_args()
 
-    with open(opt.config, 'r') as gencfg:
-        generator_config = json.loads(gencfg.read())
+imageSize = 32 # size of the image
+ngpu = 1 # number of GPUs to use
+
+game = opt.game # game to generate samples on
+tiles = opt.tiles # number of tiles in the game
+model = opt.modelToLoad # object to load the generator from
+experiment = opt.experiment # where to store the result of the experiment
+
+nz = opt.nz # size of the latent z vector
+ngf = opt.ngf # number of features
+n_extra_layers = opt.n_extra_layers # number of extra layers
+
+if not experiment or not model:
+    exit('Please specify an experiment and an object to generate')
+if not game:
+    exit('Please specify a game to generate samples on')
     
-    imageSize = generator_config["imageSize"]
-    nz = generator_config["nz"]
-    nc = generator_config["nc"]
-    ngf = generator_config["ngf"]
-    noBN = generator_config["noBN"]
-    ngpu = generator_config["ngpu"]
-    mlp_G = generator_config["mlp_G"]
-    n_extra_layers = generator_config["n_extra_layers"]
+if not os.path.exists(experiment):
+    exit('Experiment does not exist')
+if not os.path.exists(f"{experiment}/pths/{model}"):
+    exit('Model does not exist')
+if not os.path.exists(f"{experiment}/generator_results"):
+    os.makedirs(f"{experiment}/generator_results")
 
-    if noBN:
-        netG = dcgan.DCGAN_G_nobn(imageSize, nz, nc, ngf, ngpu, n_extra_layers)
-    elif mlp_G:
-        netG = mlp.MLP_G(imageSize, nz, nc, ngf, ngpu)
-    else:
-        netG = dcgan.DCGAN_G(imageSize, nz, nc, ngf, ngpu, n_extra_layers)
+generator = dcgan.DCGAN_G(imageSize, nz, tiles, ngf, ngpu, n_extra_layers)
+generator.load_state_dict(torch.load(f"{experiment}/pths/{model}", map_location=lambda storage, loc: storage, weights_only=True))
 
-    # load weights
-    netG.load_state_dict(torch.load(opt.weights))
+map_cut = [28, 14] if game == 'mario' else [16, 11]
 
-    # initialize noise
-    fixed_noise = torch.FloatTensor(opt.nimages, nz, 1, 1).normal_(0, 1)
+# testing the generator to check if it is working
+noise = torch.FloatTensor(1, nz, 1, 1)
+with torch.no_grad():
+    noise = Variable(noise)
+    
+fake = generator(noise)
 
-    if opt.cuda:
-        netG.cuda()
-        fixed_noise = fixed_noise.cuda()
+im = fake.data.cpu().numpy()
+im = im[:, :, :map_cut[1], :map_cut[0]] #Cut of rest to fit the 14x28 tile dimensions
+im = numpy.argmax(im, axis=1)
 
-    fake = netG(fixed_noise)
-    fake.data = fake.data.mul(0.5).add(0.5)
+print(im)
 
-    for i in range(opt.nimages):
-        vutils.save_image(fake.data[i, ...].reshape((1, nc, imageSize, imageSize)), os.path.join(opt.output_dir, "generated_%02d.png"%i))
+
+
+
