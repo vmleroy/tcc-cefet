@@ -79,15 +79,22 @@ if testing_generator:
 '''
 Selection of the best levels from the generator
 - Variables:
-    - n_levels: number of levels to generate
+    - [x] n_levels: number of levels to generate
     - fitness: list of fitness values for each level
         - TODO: define the fitness function
     - best_levels: list of the best levels
 - Algorithm:
-    - Generate n_levels levels
+    - [x] Generate n_levels levels
     - Calculate the fitness of each level
     - Select the best levels
 '''
+def ground_blocks_fraction(data, fraction):
+    return len(data[data == 0]) / len(data)
+
+def fitness_function(x):
+    x = numpy.array(x)
+    num_titles = len(x[x == 6])
+    return 100.0 - num_titles
             
 
 
