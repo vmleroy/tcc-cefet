@@ -26,8 +26,9 @@ opt = parser.parse_args()
 
 testing_generator = True
 
-imageSize = 32 # size of the image
 ngpu = 1 # number of GPUs to use
+image_size = 32 # size of the image
+n_levels = 32 # number of levels to generate
 
 game = opt.game # game to generate samples on
 tiles = opt.tiles # number of tiles in the game
@@ -51,7 +52,7 @@ if not os.path.exists(f"{experiment}/generator_results"):
     os.makedirs(f"{experiment}/generator_results")
 
 # Load the generator
-generator = dcgan.DCGAN_G(imageSize, nz, tiles, ngf, ngpu, n_extra_layers)
+generator = dcgan.DCGAN_G(image_size, nz, tiles, ngf, ngpu, n_extra_layers)
 generator.load_state_dict(torch.load(f"{experiment}/pths/{model}", map_location=lambda storage, loc: storage, weights_only=True))
 
 map_cut = [28, 14] if game == 'mario' else [16, 11]
@@ -74,6 +75,20 @@ if testing_generator:
         print()
     
     exit()
+    
+'''
+Selection of the best levels from the generator
+- Variables:
+    - n_levels: number of levels to generate
+    - fitness: list of fitness values for each level
+        - TODO: define the fitness function
+    - best_levels: list of the best levels
+- Algorithm:
+    - Generate n_levels levels
+    - Calculate the fitness of each level
+    - Select the best levels
+'''
+            
 
 
 
