@@ -230,7 +230,7 @@ def unify_and_translate_zelda_samples(game_dir):
   print('Total samples:', len(samples))
   print()
   
-  game_translations = json.load(open(os.path.join(game_dir, 'zelda-to-rogue-tiles.json')))
+  game_translations = json.load(open(os.path.join(game_dir, 'zelda-to-rogue-tiles-v2.json')))
   
   print('Translating samples...')
   translated_samples = []

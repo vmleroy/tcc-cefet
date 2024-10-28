@@ -24,6 +24,8 @@ parser.add_argument('--n_extra_layers', type=int, default=0)
 
 opt = parser.parse_args()
 
+testing_generator = True
+
 imageSize = 32 # size of the image
 ngpu = 1 # number of GPUs to use
 
@@ -48,23 +50,30 @@ if not os.path.exists(f"{experiment}/pths/{model}"):
 if not os.path.exists(f"{experiment}/generator_results"):
     os.makedirs(f"{experiment}/generator_results")
 
+# Load the generator
 generator = dcgan.DCGAN_G(imageSize, nz, tiles, ngf, ngpu, n_extra_layers)
 generator.load_state_dict(torch.load(f"{experiment}/pths/{model}", map_location=lambda storage, loc: storage, weights_only=True))
 
 map_cut = [28, 14] if game == 'mario' else [16, 11]
 
 # testing the generator to check if it is working
-noise = torch.FloatTensor(1, nz, 1, 1)
-with torch.no_grad():
-    noise = Variable(noise)
+if testing_generator:
+    noise = torch.FloatTensor(opt.batchSize, nz, 1, 1).normal_(0, 1)
+    with torch.no_grad():
+        noise = Variable(noise)
+        
+    fake = generator(noise)
+
+    im = fake.data.cpu().numpy()
+    im = im[:, :, :map_cut[1], :map_cut[0]] #Cut of rest to fit the 14x28 tile dimensions
+    im = numpy.argmax(im, axis=1)
+
+    for i, img in enumerate(im):
+        print(f"Level {i + 1}:")
+        print(img)
+        print()
     
-fake = generator(noise)
-
-im = fake.data.cpu().numpy()
-im = im[:, :, :map_cut[1], :map_cut[0]] #Cut of rest to fit the 14x28 tile dimensions
-im = numpy.argmax(im, axis=1)
-
-print(im)
+    exit()
 
 
 
