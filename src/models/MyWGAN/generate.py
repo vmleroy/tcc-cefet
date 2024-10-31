@@ -125,12 +125,16 @@ im = numpy.argmax(im, axis=1)
 MapFitness2D = typing.TypedDict('MapFitness2D', {'id': int, 'level': numpy.ndarray, 'fitness': float})
 map_fitness: list[MapFitness2D] =  []
 for i, img in enumerate(im):
-    pipe_fitness = calculate_pipe_fitness(level=img, data_pipes={
-        'max_pipes': 2,
-        'alpha': 0.2,
-        'min_pipes': 1,
-        'beta': 0.2
-    })
+    pipe_fitness = calculate_pipe_fitness(level=img, 
+        data_pipes={
+            'max_pipes': 2,
+            'alpha': 0.2,
+            'min_pipes': 1,
+            'beta': 0.2
+        }, 
+        data_wrong_placement={
+            'gama': 0.2
+        })
     map_fitness.append({'id': i, 'level': img, 'fitness': pipe_fitness})
 
 map_fitness = sorted(map_fitness, key=lambda x: x['fitness'])

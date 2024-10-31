@@ -88,9 +88,12 @@ def get_pipes_positions(pipes: list[Pipe]) -> list[PipePositions2D]:
 Fitness function for the pipes
 1. Calculate max pipes in the level
 2. Calculate min pipes in the level
+3. Penalty for wrong placement of pipes or pipes blocks
 '''
 ArgumentsForNumberOfPipes = typing.TypedDict('ArgumentsForNumberOfPipes', {'max_pipes': int, 'alpha': float, 'min_pipes': int, 'beta': float})
 StartDataForNumberOfPipes:ArgumentsForNumberOfPipes = {'max_pipes': 1, 'alpha': 0.2, 'min_pipes': 1, 'beta': 0.2}
+ArgumentsForWrongPipesPlacement = typing.TypedDict('ArgumentsForWrongPipesPlacement', {'gama': float})
+StartDataForWrongPipesPlacement:ArgumentsForWrongPipesPlacement = {'gama': 0.2}
 
 def max_pipes_in_level(level:numpy.ndarray, max_pipes:int=1, alpha:float=0.2) -> float:
   pipes = find_pipes(level)
@@ -106,6 +109,17 @@ def min_pipes_in_level(level:numpy.ndarray, min_pipes:int=1, beta:float=0.2) -> 
     return abs(n_pipes - min_pipes) * beta
   return 0.0
 
-def calculate_pipe_fitness(level:numpy.ndarray, data_pipes:ArgumentsForNumberOfPipes=StartDataForNumberOfPipes) -> float:
-  return max_pipes_in_level(level, data_pipes['max_pipes'], data_pipes['alpha']) + min_pipes_in_level(level, data_pipes['min_pipes'], data_pipes['beta'])
+def wrong_pipes_placement(level:numpy.ndarray, gama:float=0.2) -> float:
+  pipes = find_pipes(level)
+  pipes_positions = get_pipes_positions(pipes)
+  value = 0.0
+  for index_row, row in enumerate(level):
+    for index_column, column in enumerate(row):
+      if column in PipeTokens.values():
+        if {'x': index_column, 'y': index_row, 'value': column} not in pipes_positions:
+          value += gama
+  return value
+
+def calculate_pipe_fitness(level:numpy.ndarray, data_pipes:ArgumentsForNumberOfPipes=StartDataForNumberOfPipes, data_wrong_placement:ArgumentsForWrongPipesPlacement=StartDataForWrongPipesPlacement) -> float:
+  return max_pipes_in_level(level, data_pipes['max_pipes'], data_pipes['alpha']) + min_pipes_in_level(level, data_pipes['min_pipes'], data_pipes['beta']) + wrong_pipes_placement(level, data_wrong_placement['gama'])
   
