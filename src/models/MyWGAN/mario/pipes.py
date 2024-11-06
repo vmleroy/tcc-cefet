@@ -1,7 +1,7 @@
 import typing
 import numpy
 
-from .blocks import GroundTokens
+from .blocks import GroundBlocks
 
 PipeTokens2D = typing.TypedDict('PipeTokens2D', {'top_left': int, 'top_right': int, 'bottom_left': int, 'bottom_right': int})
 PipeTokens: PipeTokens2D = {
@@ -55,7 +55,7 @@ def find_pipes(level: numpy.ndarray) -> list[Pipe]:
           
           # If the pipe is placed on top of a block, we need to check if the pipe is valid
           # To be valid the pipe must be on top of a ground block of a breakable block
-          if level[i][x] in GroundTokens.values() and level[i][x+1] in GroundTokens.values():
+          if level[i][x] in GroundBlocks.values() and level[i][x+1] in GroundBlocks.values():
             break
           
           # If the pipe is placed on top of another block, we skip this pipe
@@ -66,7 +66,7 @@ def find_pipes(level: numpy.ndarray) -> list[Pipe]:
         # We have to check 4 blocks above the pipe to make sure the pipe is valid and the game can be played      
         if valid:
           for i in range(y-4, y, 1):
-            if level[i][x] in GroundTokens.values() and level[i][x+1] in GroundTokens.values():
+            if level[i][x] in GroundBlocks.values() and level[i][x+1] in GroundBlocks.values():
               break
             if level[i][x] in PipeTokens.values() or level[i][x+1] in PipeTokens.values():
               valid = False

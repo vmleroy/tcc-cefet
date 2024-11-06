@@ -1,7 +1,7 @@
 import typing
 
 EmptyTokens2D = typing.TypedDict('EmptyTokens2D', {'empty': int})
-EmptyTokens: EmptyTokens2D = {
+EmptyBlocks: EmptyTokens2D = {
     'empty': 2
 }
 
@@ -17,11 +17,6 @@ BreakableBlocks: BreakableBlocks2D = {
 }
 
 GroundTokens2D = typing.TypedDict('GroundTokens2D', {'ground': int})
-GroundTokens: GroundTokens2D = {
+GroundBlocks: GroundTokens2D = {
     'ground': 0,
-}
-
-EnemiesTokens2D = typing.TypedDict('EnemiesTokens2D', {'goomba': int})
-EnemiesTokens = {
-    'goomba': 5,
 }

@@ -13,6 +13,7 @@ from torch.autograd import Variable
 
 import models.dcgan as dcgan
 from mario.pipes import calculate_pipe_fitness, find_pipes, get_pipes_positions, PipeTokens
+from mario.enemies import calculate_enemies_fitness, find_enemies, get_enemies_positions, EnemiesTokens
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--game', help='The game to generate samples on', choices=['mario', 'zelda'])
@@ -125,6 +126,7 @@ im = numpy.argmax(im, axis=1)
 MapFitness2D = typing.TypedDict('MapFitness2D', {'id': int, 'level': numpy.ndarray, 'fitness': float})
 map_fitness: list[MapFitness2D] =  []
 for i, img in enumerate(im):
+    fitness = 0.0
     pipe_fitness = calculate_pipe_fitness(level=img, 
         data_pipes={
             'max_pipes': 2,
@@ -135,7 +137,18 @@ for i, img in enumerate(im):
         data_wrong_placement={
             'gama': 0.2
         })
-    map_fitness.append({'id': i, 'level': img, 'fitness': pipe_fitness})
+    enemies_fitness = calculate_enemies_fitness(level=img,
+        data_enemies={
+            'max_enemies': 3,
+            'alpha': 0.2,
+            'min_enemies': 2,
+            'beta': 0.2
+        },
+        data_wrong_placement={
+            'gama': 0.2
+        })
+    fitness = pipe_fitness + enemies_fitness
+    map_fitness.append({'id': i, 'level': img, 'fitness': fitness})
 
 map_fitness = sorted(map_fitness, key=lambda x: x['fitness'])
 best_maps = map_fitness[:10]
@@ -144,12 +157,20 @@ for index, i in enumerate(best_maps):
     pipes = find_pipes(i['level'])
     pipes_positions = get_pipes_positions(pipes)
     
+    enemies = find_enemies(i['level'])
+    enemies_positions = get_enemies_positions(enemies)
+    
     print(f"Level {index} - id:{i['id']}:")
     for index_row, row in enumerate(i['level']):
         for index_column, column in enumerate(row):
             if column in PipeTokens.values():
                 if {'x': index_column, 'y': index_row, 'value': column} in pipes_positions:
                     print(f"\x1b[32m{column}\x1b[0m", end=' ')
+                else:
+                    print(f"\x1b[31m{column}\x1b[0m", end=' ')
+            elif column in EnemiesTokens.values():
+                if (index_column, index_row) in enemies_positions:
+                    print(f"\x1b[35m{column}\x1b[0m", end=' ')
                 else:
                     print(f"\x1b[31m{column}\x1b[0m", end=' ')
             else:
