@@ -69,6 +69,7 @@ def wrong_enemies_placement(level:numpy.ndarray, gama:float=0.2) -> float:
                 x, y = enemy.position
                 if y > len(level) - 2 or level[y+1][x] in EmptyBlocks.values():
                     value += gama
+                continue
             case _:
                 pass
     return value

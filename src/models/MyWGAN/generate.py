@@ -8,12 +8,13 @@ import numpy
 import typing
 
 import torch
-import torchvision.utils as vutils
-from torch.autograd import Variable
-
 import models.dcgan as dcgan
+
+from torch.autograd import Variable
 from mario.pipes import calculate_pipe_fitness, find_pipes, get_pipes_positions, PipeTokens
-from mario.enemies import calculate_enemies_fitness, find_enemies, get_enemies_positions, EnemiesTokens
+from mario.enemies import find_enemies, get_enemies_positions, EnemiesTokens
+from mario.blocks import find_holes, get_holes_positions, EmptyBlocks
+from utils.fitness import calculate_fitness, print_fitness_specs
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--game', help='The game to generate samples on', choices=['mario', 'zelda'])
@@ -107,12 +108,12 @@ if testing_generator:
 Selection of the best levels from the generator
 - Variables:
     - [x] n_levels: number of levels to generate
-    - fitness: list of fitness values for each level
-    - best_levels: list of the best levels
+    - [x] fitness: list of fitness values for each level
+    - [x] best_levels: list of the best levels
 - Algorithm:
     - [x] Generate n_levels levels
-    - Calculate the fitness of each level
-    - Select the best levels
+    - [x] Calculate the fitness of each level
+    - [x] Select the best levels
 '''
 noise = torch.FloatTensor(n_levels, nz, 1, 1).normal_(0, 1)
 with torch.no_grad():
@@ -126,32 +127,14 @@ im = numpy.argmax(im, axis=1)
 MapFitness2D = typing.TypedDict('MapFitness2D', {'id': int, 'level': numpy.ndarray, 'fitness': float})
 map_fitness: list[MapFitness2D] =  []
 for i, img in enumerate(im):
-    fitness = 0.0
-    pipe_fitness = calculate_pipe_fitness(level=img, 
-        data_pipes={
-            'max_pipes': 2,
-            'alpha': 0.2,
-            'min_pipes': 1,
-            'beta': 0.2
-        }, 
-        data_wrong_placement={
-            'gama': 0.2
-        })
-    enemies_fitness = calculate_enemies_fitness(level=img,
-        data_enemies={
-            'max_enemies': 3,
-            'alpha': 0.2,
-            'min_enemies': 2,
-            'beta': 0.2
-        },
-        data_wrong_placement={
-            'gama': 0.2
-        })
-    fitness = pipe_fitness + enemies_fitness
+    fitness = calculate_fitness(img, print_specs=True if i == 0 else False)
     map_fitness.append({'id': i, 'level': img, 'fitness': fitness})
 
 map_fitness = sorted(map_fitness, key=lambda x: x['fitness'])
-best_maps = map_fitness[:10]
+best_maps = map_fitness[:20]
+
+
+print_fitness_specs()
 
 for index, i in enumerate(best_maps):
     pipes = find_pipes(i['level'])
@@ -159,6 +142,9 @@ for index, i in enumerate(best_maps):
     
     enemies = find_enemies(i['level'])
     enemies_positions = get_enemies_positions(enemies)
+    
+    holes = find_holes(i['level'])
+    holes_positions = get_holes_positions(holes)
     
     print(f"Level {index} - id:{i['id']}:")
     for index_row, row in enumerate(i['level']):
@@ -173,11 +159,18 @@ for index, i in enumerate(best_maps):
                     print(f"\x1b[35m{column}\x1b[0m", end=' ')
                 else:
                     print(f"\x1b[31m{column}\x1b[0m", end=' ')
+            elif column in EmptyBlocks.values():
+                if (index_column, index_row) in holes_positions:
+                    print(f"\x1b[34m{column}\x1b[0m", end=' ')
+                else:
+                    print(column, end=' ')
             else:
                 print(column, end=' ')   
         print()
-    print(f"Pipes: {len(pipes)}")
     print(f"Fitness: {i['fitness']}")
+    print(f"  Enemies: {len(enemies)}")
+    print(f"  Pipes:   {len(pipes)}")
+    print(f"  Holes:   {len(holes)}")
     print()
 
 
