@@ -1,14 +1,14 @@
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b X b b b b b X X X b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b X b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b X X b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
+----------------------------
+----------------------------
+-SSSSSSSSSSS----------------
+----------------------------
+----------------------------
+----------------XX----------
+---------------XXX----------
+---------------XXX----------
+--------------XXXX----------
+-E------Q-XXXX--XX----X----E
+<>-------XX-XXX-XX----X---<>
+[]-------XXXXXXXXX---XX---[]
+[]-E--------XXXXXX---XX---[]
+XXXXXXXXXXXXXXXXXX--XXXXX-XX

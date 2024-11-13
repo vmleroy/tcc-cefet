@@ -1,14 +1,14 @@
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b S b S S 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b E E b b b b b b b b b b b b b b b b b b b 
-X X X X X X X X X X X X X X X X X X X b X X X X X X X X 
+----------------------------
+----------------------------
+----------------------------
+----------------------------
+----------------------------
+SSS-------------------------
+----------------------------
+----------------------------
+----------------------------
+-S---------------XX---------
+----------------XXXX--------
+---------------XXXXX-------X
+--------------XXXXXX-------X
+XXXXXXXXXXXXXXXXXXX----XX-XX

@@ -1,14 +1,14 @@
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-S S S S S b S S S S b b b b b b b b b b b b S S S S S b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b S S b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b X b b b b b b b b b 
-b b b b b b b b b b b b b b b b b b X b b b b b b b b b 
-X X X X X X X X X X X X X X X X X X X X X X X b b X X X 
+----------------------------
+----------------------------
+SSSSSSSSSSSSSSSSSSSSSSSSSSSS
+--SSSSSSSS-SS-S-------SSS---
+SSSSSSSSSSS---S-------SSS---
+SSSSSSSSSS---SSS------SSSSS-
+----------------------------
+----------------------------
+---E-------------------SS---
+SSSSSSSSSS---------E--------
+----SSSSSS--------<>--------
+---SSSSSS-------X-[]--------
+---SSSSSS-------X-[]--------
+XXXX-XXXXXXXXXXXXXXXXXXXXXXX

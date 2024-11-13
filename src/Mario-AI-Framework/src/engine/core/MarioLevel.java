@@ -281,6 +281,7 @@ public class MarioLevel {
         level.marioTileY = this.marioTileY;
         level.exitTileX = this.exitTileX;
         level.exitTileY = this.exitTileY;
+        System.out.println(this.levelTiles);
         level.levelTiles = new int[this.levelTiles.length][this.levelTiles[0].length];
         level.lastSpawnTime = new int[this.levelTiles.length][this.levelTiles[0].length];
         for (int x = 0; x < level.levelTiles.length; x++) {

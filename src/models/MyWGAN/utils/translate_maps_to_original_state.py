@@ -11,5 +11,6 @@ def translate_to_original(src: str, level: numpy.ndarray):
       for key, value in json_map_translate.items():
         if value == column:
           translated_level[index_row][index_column] = key
+          break
       
   return translated_level

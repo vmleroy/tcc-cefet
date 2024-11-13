@@ -180,14 +180,14 @@ for index, i in enumerate(best_maps):
     with open(f"{experiment}/generator_results/original/sample_{index}.txt", 'w') as f:
         for row in i['level']:
             for column in row:
-                f.write(f"{column} ")
+                f.write(f"{column}")
             f.write('\n')
     
     with open(f"{experiment}/generator_results/translated/sample_{index}.txt", 'w') as f:
         translated_sample = translate_to_original(f"src/data/{game}/mario-tiles.json", i['level'])
         for row in translated_sample:
             for column in row:
-                f.write(f"{column} ")
+                f.write(f"{column}")
             f.write('\n')
         
 
