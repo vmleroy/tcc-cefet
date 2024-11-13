@@ -16,12 +16,14 @@ from mario.enemies import find_enemies, get_enemies_positions, EnemiesTokens
 from mario.blocks import find_holes, get_holes_positions, EmptyBlocks
 from utils.fitness import calculate_fitness, print_fitness_specs
 
+from utils.translate_maps_to_original_state import translate_to_original
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--game', help='The game to generate samples on', choices=['mario', 'zelda'])
 parser.add_argument('--tiles', type=int, default=10, help='The number of tiles in the game')
 parser.add_argument('--modelToLoad', default=32, help='The object to load the generator from')
 parser.add_argument('--experiment', help='Where to store the result of the experiment')
-parser.add_argument('--batchSize', type=int, default=1, help='Batch size (number of levels that are generated at once)')
+parser.add_argument('--batchSize', type=int, default=1, help='Batch size (number of levels that are going to be selected from the generator). MAX: 10000')
 parser.add_argument('--nz', type=int, default=32, help='size of the latent z vector')
 parser.add_argument('--ngf', type=int, default=64)
 parser.add_argument('--n_extra_layers', type=int, default=0)
@@ -32,7 +34,7 @@ testing_generator = False
 
 ngpu = 1 # number of GPUs to use
 image_size = 32 # size of the image
-n_levels = opt.batchSize # number of levels to generate
+n_levels = 10000 # number of levels to generate
 
 game = opt.game # game to generate samples on
 tiles = opt.tiles # number of tiles in the game
@@ -54,6 +56,8 @@ if not os.path.exists(f"{experiment}/pths/{model}"):
     exit('Model does not exist')
 if not os.path.exists(f"{experiment}/generator_results"):
     os.makedirs(f"{experiment}/generator_results")
+    os.makedirs(f"{experiment}/generator_results/original")
+    os.makedirs(f"{experiment}/generator_results/translated")
 
 # Load the generator
 generator = dcgan.DCGAN_G(image_size, nz, tiles, ngf, ngpu, n_extra_layers)
@@ -131,7 +135,7 @@ for i, img in enumerate(im):
     map_fitness.append({'id': i, 'level': img, 'fitness': fitness})
 
 map_fitness = sorted(map_fitness, key=lambda x: x['fitness'])
-best_maps = map_fitness[:20]
+best_maps = map_fitness[:opt.batchSize]
 
 
 print_fitness_specs()
@@ -172,6 +176,20 @@ for index, i in enumerate(best_maps):
     print(f"  Pipes:   {len(pipes)}")
     print(f"  Holes:   {len(holes)}")
     print()
+    
+    with open(f"{experiment}/generator_results/original/sample_{index}.txt", 'w') as f:
+        for row in i['level']:
+            for column in row:
+                f.write(f"{column} ")
+            f.write('\n')
+    
+    with open(f"{experiment}/generator_results/translated/sample_{index}.txt", 'w') as f:
+        translated_sample = translate_to_original(f"src/data/{game}/mario-tiles.json", i['level'])
+        for row in translated_sample:
+            for column in row:
+                f.write(f"{column} ")
+            f.write('\n')
+        
 
 
     

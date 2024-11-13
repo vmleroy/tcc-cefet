@@ -1,0 +1,14 @@
+b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
+b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
+b b S S S S S S S S S S S S S S b b b b b b b b b b b b 
+b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
+b b b b b b b S S b b b b b b b b b b b b b b b b b b b 
+b b S S S S b S S b b b b S b b b b b b b b b b b b b b 
+b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
+b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
+b b b b b b b b b b b b b b b b b b b b b b b E b b b b 
+S S S S S b b S b b b b b b b b b b X E b b < > b b b b 
+b b b b b b b S S b b b b b b b b b < > b b [ ] b b b b 
+b b b b b b < > b b b b b b b b X X [ ] b b [ ] b b b b 
+b b b b b b [ ] b b b b b b b X X X [ ] b b [ ] b b b b 
+X X X X X X X X X X X X X X X X X X X X X X X X X X X X 
