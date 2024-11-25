@@ -56,6 +56,8 @@ if not os.path.exists(f"{experiment}/pths/{model}"):
     exit('Model does not exist')
 if not os.path.exists(f"{experiment}/generator_results"):
     os.makedirs(f"{experiment}/generator_results")
+    os.makedirs(f"{experiment}/generator_results/gan_generated_original")
+    os.makedirs(f"{experiment}/generator_results/gan_generated_translated")
     os.makedirs(f"{experiment}/generator_results/original")
     os.makedirs(f"{experiment}/generator_results/translated")
 
@@ -133,10 +135,22 @@ map_fitness: list[MapFitness2D] =  []
 for i, img in enumerate(im):
     fitness = calculate_fitness(img, print_specs=True if i == 0 else False)
     map_fitness.append({'id': i, 'level': img, 'fitness': fitness})
+    
+    with open(f"{experiment}/generator_results/gan_generated_original/sample_{i}.txt", 'w') as f:
+        for row in img:
+            for column in row:
+                f.write(f"{column}")
+            f.write('\n')
+    
+    with open(f"{experiment}/generator_results/gan_generated_translated/sample_{i}.txt", 'w') as f:
+        translated_sample = translate_to_original(f"src/data/{game}/mario-tiles.json", img)
+        for row in translated_sample:
+            for column in row:
+                f.write(f"{column}")
+            f.write('\n')
 
 map_fitness = sorted(map_fitness, key=lambda x: x['fitness'])
 best_maps = map_fitness[:opt.batchSize]
-
 
 print_fitness_specs()
 

@@ -1,7 +1,0 @@
-****************************************************************
-Game Status: LOSE Percentage Completion: 0.25031018
-Lives: 0 Coins: 0 Remaining Time: 60
-Mario State: 0 (Mushrooms: 0 Fire Flowers: 0)
-Total Kills: 0 (Stomps: 0 Fireballs: 0 Shells: 0 Falls: 0)
-Bricks: 0 Jumps: 0 Max X Jump: 0.0 Max Air Time: 0
-****************************************************************
