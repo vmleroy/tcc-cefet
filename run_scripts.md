@@ -14,4 +14,4 @@ Generation -- Mine
 * python3 src/models/MyWGAN/generate.py --experiment=src/data/mario/results/db-mine_nz-32_tiles-10_ngf-64_ndf-64_wgan-mine_v-2 --game=mario --tiles=10 --batchSize=1000 --modelToLoad=netG_epoch_77500_32.pth
 
 Mario AI
-* /usr/bin/env /usr/lib/jvm/java-11-openjdk-amd64/bin/java -cp /home/victor/.config/Code/User/workspaceStorage/3c9bc8e5720ecb564e00f004aa211ee6/redhat.java/jdt_ws/tcc-cefet_9881cbcc/bin PlayLevel src/data/mario/results/db-mine_nz-32_tiles-10_ngf-64_ndf-64_wgan-mine_v-2/
+* /usr/bin/env /usr/lib/jvm/java-11-openjdk-amd64/bin/java -cp /home/victor/.config/Code/User/workspaceStorage/3c9bc8e5720ecb564e00f004aa211ee6/redhat.java/jdt_ws/tcc-cefet_9881cbcc/bin PlayLevel -d src/data/mario/results/db-mine_nz-32_tiles-10_ngf-64_ndf-64_wgan-mine_v-2/ -ai default

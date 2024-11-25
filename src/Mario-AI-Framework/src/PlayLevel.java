@@ -134,8 +134,24 @@ public class PlayLevel {
         // printResults(game.runGame(new agents.robinBaumgarten.Agent(),
         // getLevel("./levels/original/lvl-1.txt"), 20, 0, true));
 
-        String folderPath = args.length > 0
-                ? (System.getProperty("user.dir") + "/" + args[0] + "/generator_results/translated")
+        String pathToDirectory = "";
+        String useOfAI = "default";
+
+        System.out.println("args: " + args.length);
+
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("-d")) {
+                pathToDirectory = args[i + 1].trim();
+            } else if (args[i].equals("-ai")) {
+                useOfAI = args[i + 1].trim();
+            }
+        }
+
+        String folderPath = pathToDirectory != ""
+                ? useOfAI.equals("default")
+                        ? (System.getProperty("user.dir") + "/" + pathToDirectory + "/generator_results/translated")
+                        : (System.getProperty("user.dir") + "/" + pathToDirectory
+                                + "/generator_results/gan_generated_translated")
                 : System.getProperty("user.dir") + "/src/data/mario/vglc";
         File folder = new File(folderPath);
         File[] listOfFiles = folder.listFiles();
@@ -172,7 +188,10 @@ public class PlayLevel {
             sampleResults[i] = sampleResult;
             System.out.println("Sample result: " + listOfFiles[i].getName());
             saveResults(sampleResults[i],
-                    System.getProperty("user.dir") + "/" + args[0] + "/generator_results/translated_logs/",
+                    useOfAI.equals("default")
+                            ? System.getProperty("user.dir") + "/" + pathToDirectory + "/generator_results/translated_logs/"
+                            : System.getProperty("user.dir") + "/" + pathToDirectory
+                                    + "/generator_results/gan_generated_translated_logs/",
                     listOfFiles[i].getName());
             printResults(sampleResults[i]);
 
@@ -223,10 +242,16 @@ public class PlayLevel {
                 MarioResult completeResult = game.runGame(new agents.robinBaumgarten.Agent(), completeLevelString,
                         timer, 0);
                 saveResults(completeResult,
-                        System.getProperty("user.dir") + "/" + args[0] + "/generator_results/complete_levels/",
+                        useOfAI.equals("default")
+                                ? System.getProperty("user.dir") + "/" + pathToDirectory + "/generator_results/complete_levels/"
+                                : System.getProperty("user.dir") + "/" + pathToDirectory
+                                        + "/generator_results/gan_generated_complete_levels/",
                         "log_complete_" + complete_levels_index + ".txt");
                 saveMap(completeLevelString,
-                        System.getProperty("user.dir") + "/" + args[0] + "/generator_results/complete_levels/",
+                        useOfAI.equals("default")
+                                ? System.getProperty("user.dir") + "/" + pathToDirectory + "/generator_results/complete_levels/"
+                                : System.getProperty("user.dir") + "/" + pathToDirectory
+                                        + "/generator_results/gan_generated_complete_levels/",
                         "lvl_complete_" + complete_levels_index + ".txt");
                 complete_levels_index++;
                 completeLevel = null;
