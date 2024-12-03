@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.Arrays;
 import java.nio.file.Path;
 import java.io.File;
@@ -8,9 +9,8 @@ import java.io.File;
 import engine.core.MarioGame;
 import engine.core.MarioResult;
 import engine.helper.GameStatus;
-import thread.GameRunnable;
 
-public class PlayLevel {
+public class PlayLevel_v1 {
     public static void printResults(MarioResult result) {
         System.out.println("****************************************************************" + "\n"
                 + "Game Status: " + result.getGameStatus().toString() + "\n"
@@ -128,20 +128,22 @@ public class PlayLevel {
     }
 
     public static void main(String[] args) {
+        MarioGame game = new MarioGame();
+        // printResults(game.playGame(getLevel("../levels/original/lvl-1.txt"), 200,
+        // 0));
+        // printResults(game.runGame(new agents.robinBaumgarten.Agent(),
+        // getLevel("./levels/original/lvl-1.txt"), 20, 0, true));
+
         String pathToDirectory = "";
         String useOfAI = "default";
-        Integer numberOfThreads = 10;
+
+        System.out.println("args: " + args.length);
 
         for (int i = 0; i < args.length; i++) {
-            switch (args[i]) {
-                case "-directory":
-                    pathToDirectory = args[i + 1].trim();
-                    break;
-                case "-ai":
-                    useOfAI = args[i + 1].trim();
-                    break;
-                default:
-                    break;
+            if (args[i].equals("-d")) {
+                pathToDirectory = args[i + 1].trim();
+            } else if (args[i].equals("-ai")) {
+                useOfAI = args[i + 1].trim();
             }
         }
 
@@ -153,82 +155,107 @@ public class PlayLevel {
                 : System.getProperty("user.dir") + "/src/data/mario/vglc";
         File folder = new File(folderPath);
         File[] listOfFiles = folder.listFiles();
-        for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isFile()) {
-                System.out.println("File " + listOfFiles[i].getName());
-            }
-        }
         Arrays.sort(listOfFiles, (a, b) -> {
             String[] aSplit = a.getName().split("_");
             String[] bSplit = b.getName().split("_");
             return Integer.parseInt(aSplit[1].split(".txt")[0]) - Integer.parseInt(bSplit[1].split(".txt")[0]);
         });
 
-        Integer timer = 10;
+        MarioResult[] sampleResults = new MarioResult[listOfFiles.length];
 
-        Thread[] threads = new Thread[numberOfThreads];
-        GameRunnable[] runnables = new GameRunnable[numberOfThreads];
+        Integer timer = 60;
+        Integer repeatSameLevel = 10;
+        Integer complete_levels_index = 0;
 
-        for (int i = 0; i < numberOfThreads; i++) {
-            runnables[i] = new GameRunnable();
-            runnables[i].setTimer(timer);
-            threads[i] = null;
-        }
+        String[] completeLevel = null;
 
         for (int i = 0; i < listOfFiles.length; i++) {
+            System.out.println("Playing level: " + listOfFiles[i].getName() + " " + listOfFiles[i].getPath());
             String level = getLevel(listOfFiles[i].getPath());
 
-            /**
-             * Run samples to check if they are playable
-             */
-            for (int j = 0; j < numberOfThreads; j++) {
-                if (threads[j] == null || !threads[j].isAlive()) {
-                    runnables[j].setLevel(level);
-                    threads[j] = new Thread(runnables[j]);
-                    threads[j].start();
+            // results[i] = game.runGame(new agents.robinBaumgarten.Agent(), level, timer,
+            // 0);
+            // results[i] = game.playGame(level, timer, 0);
+
+            // Run only the sample to check if it is winnable
+            MarioResult sampleResult = null;
+            for (int j = 0; j < repeatSameLevel; j++) {
+                sampleResult = game.runGame(new agents.robinBaumgarten.Agent(), level, timer, 0);
+                if (sampleResult.getGameStatus() == GameStatus.WIN) {
                     break;
                 }
             }
+            sampleResults[i] = sampleResult;
+            System.out.println("Sample result: " + listOfFiles[i].getName());
+            saveResults(sampleResults[i],
+                    useOfAI.equals("default")
+                            ? System.getProperty("user.dir") + "/" + pathToDirectory + "/generator_results/translated_logs/"
+                            : System.getProperty("user.dir") + "/" + pathToDirectory
+                                    + "/generator_results/gan_generated_translated_logs/",
+                    listOfFiles[i].getName());
+            printResults(sampleResults[i]);
 
-            try {
-                for (int j = 0; j < numberOfThreads; j++) {
-                    if (threads[j] != null && threads[j].isAlive()) {
-                        threads[j].join();
+            /**
+             * If the sample is winnable, run the game again concatenating with other
+             * samples that are winnable
+             * Then check if the concatenated level is winnable
+             * If it is winnable, save the results
+             * Else, keep the completeLevel as it is
+             */
+
+            if (sampleResult.getGameStatus() == GameStatus.WIN) {
+                String[] completeLevelDuplicate = completeLevel;
+
+                if (completeLevelDuplicate == null) {
+                    completeLevelDuplicate = new String[1];
+                    completeLevelDuplicate[0] = level;
+                } else {
+                    String[] temp = new String[completeLevelDuplicate.length + 1];
+                    for (int j = 0; j < completeLevelDuplicate.length; j++) {
+                        System.out.println("level: " + completeLevelDuplicate[j]);
+                        temp[j] = completeLevelDuplicate[j];
                     }
+                    temp[completeLevelDuplicate.length] = level;
+                    completeLevelDuplicate = temp;
                 }
 
-                MarioResult result = null;
-                for (int j = 0; j < numberOfThreads; j++) {
-                    if (threads[j] != null && !threads[j].isAlive()) {
-                        result = runnables[j].getResult();
-                        if (result.getGameStatus() == GameStatus.WIN) {
-                            System.out.println("Sample result: " + listOfFiles[i].getName());
-                            saveResults(result,
-                                    useOfAI.equals("default")
-                                            ? System.getProperty("user.dir") + "/" + pathToDirectory
-                                                    + "/generator_results/translated_logs/"
-                                            : System.getProperty("user.dir") + "/" + pathToDirectory
-                                                    + "/generator_results/gan_generated_translated_logs/",
-                                    listOfFiles[i].getName());
-                            printResults(result);
-                            break;
-                        }
+                String completeLevelString = concatenateSamples(completeLevelDuplicate);
+                System.out.println("Complete level: \n" + completeLevelString);
+                MarioResult completeResult = null;
+
+                for (int j = 0; j < repeatSameLevel; j++) {
+                    completeResult = game.runGame(new agents.robinBaumgarten.Agent(), completeLevelString, timer, 0);
+                    if (completeResult.getGameStatus() == GameStatus.WIN) {
+                        completeLevel = completeLevelDuplicate;
                         break;
                     }
                 }
+            }
 
-                System.out.println("Sample result: " + listOfFiles[i].getName());
-                saveResults(result,
+            /**
+             * If the completeLevel have a size of 10, save the results and reset the
+             * completeLevel
+             */
+            if (completeLevel != null && completeLevel.length == 10) {
+                String completeLevelString = concatenateSamples(completeLevel);
+                System.out.println("Complete level: \n" + completeLevelString);
+                MarioResult completeResult = game.runGame(new agents.robinBaumgarten.Agent(), completeLevelString,
+                        timer, 0);
+                saveResults(completeResult,
                         useOfAI.equals("default")
-                                ? System.getProperty("user.dir") + "/" + pathToDirectory
-                                        + "/generator_results/translated_logs/"
+                                ? System.getProperty("user.dir") + "/" + pathToDirectory + "/generator_results/complete_levels/"
                                 : System.getProperty("user.dir") + "/" + pathToDirectory
-                                        + "/generator_results/gan_generated_translated_logs/",
-                        listOfFiles[i].getName());
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                                        + "/generator_results/gan_generated_complete_levels/",
+                        "log_complete_" + complete_levels_index + ".txt");
+                saveMap(completeLevelString,
+                        useOfAI.equals("default")
+                                ? System.getProperty("user.dir") + "/" + pathToDirectory + "/generator_results/complete_levels/"
+                                : System.getProperty("user.dir") + "/" + pathToDirectory
+                                        + "/generator_results/gan_generated_complete_levels/",
+                        "lvl_complete_" + complete_levels_index + ".txt");
+                complete_levels_index++;
+                completeLevel = null;
             }
         }
-
     }
 }
