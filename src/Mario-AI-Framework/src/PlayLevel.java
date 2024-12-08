@@ -1,47 +1,7 @@
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Arrays;
-import java.nio.file.Path;
 import java.io.File;
 
 public class PlayLevel {
-    public static Boolean saveMap(String map, String filepath, String fileName) {
-        try {
-            Path path = Paths.get(filepath);
-            if (!Files.exists(path)) {
-                Files.createDirectories(path);
-            }
-
-            path = Paths.get(filepath + fileName);
-            Files.write(path, map.getBytes());
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
-    }
-
-    public static String concatenateSamples(String[] samples) {
-        String level = "";
-
-        String[] splittedLevel = new String[14];
-        for (int i = 0; i < samples.length; i++) {
-            String[] lines = samples[i].split("\n");
-            for (int j = 0; j < lines.length; j++) {
-                if (splittedLevel[j] == null) {
-                    splittedLevel[j] = lines[j];
-                } else {
-                    splittedLevel[j] += lines[j];
-                }
-            }
-        }
-
-        for (int i = 0; i < splittedLevel.length; i++) {
-            level += splittedLevel[i] + "\n";
-        }
-
-        return level;
-    }
 
     public static void main(String[] args) {
         String pathToDirectory = "";
@@ -88,6 +48,9 @@ public class PlayLevel {
         switch (execution) {
             case "samples":
                 algorithm.executeOnlySamples(10);
+                break;
+            case "levels":
+                algorithm.executeGenerateLevelsWithWinSamples(40);
                 break;
             default:
                 break;
