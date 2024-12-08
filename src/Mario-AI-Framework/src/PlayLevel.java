@@ -52,6 +52,9 @@ public class PlayLevel {
             case "levels":
                 algorithm.executeGenerateLevelsWithWinSamples(40);
                 break;
+            case "levels_all_samples":
+                algorithm.executeGenerateLevelsWithWinSamples(40);
+                break;
             default:
                 break;
         }

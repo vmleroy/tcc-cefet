@@ -353,6 +353,7 @@ public class AlgorithmExecution {
             if (result.getGameStatus() == GameStatus.WIN) {
               completeLevel = completeLevelDuplicate;
               mapSamples[mapSamplesIndex] = winningSamples[i].getName();
+              mapSamplesIndex++;
 
               break;
             }
@@ -378,19 +379,120 @@ public class AlgorithmExecution {
 
         saveLevelLogResults(result,
             useOfAI.equals("default")
-                ? System.getProperty("user.dir") + "/" + pathToDirectory + "/generator_results/complete_levels/"
+                ? System.getProperty("user.dir") + "/" + pathToDirectory
+                    + "/generator_results/complete_levels_winnable_samples/"
                 : System.getProperty("user.dir") + "/" + pathToDirectory
-                    + "/generator_results/gan_generated_complete_levels/",
-            "log_complete_" + completeLevelsIndex + ".txt", mapSamplesString);
+                    + "/generator_results/gan_generated_complete_levels_winnable_samples/",
+            "lvl_complete_" + completeLevelsIndex + "_log" + ".txt", mapSamplesString);
 
         saveMap(completeLevelString,
             useOfAI.equals("default")
-                ? System.getProperty("user.dir") + "/" + pathToDirectory + "/generator_results/complete_levels/"
+                ? System.getProperty("user.dir") + "/" + pathToDirectory
+                    + "/generator_results/complete_levels_winnable_samples/"
                 : System.getProperty("user.dir") + "/" + pathToDirectory
-                    + "/generator_results/gan_generated_complete_levels/",
-            "lvl_complete_" + completeLevelsIndex + ".txt");
+                    + "/generator_results/gan_generated_complete_levels_winnable_samples/",
+            "lvl_complete_" + completeLevelsIndex + "_map" + ".txt");
 
         completeLevelsIndex++;
+        mapSamplesIndex = 0;
+        completeLevel = null;
+      }
+    }
+  }
+
+  public void executeGenerateLevelsWithAllSamples(Integer timer) {
+    GameRunnable[] runnables = setThreadRunnables(timer);
+
+    String[] completeLevel = null;
+    String[] mapSamples = new String[10];
+    Integer mapSamplesIndex = 0;
+    Integer completeLevelsIndex = 0;
+
+    /**
+     * Generate levels with winning samples
+     */
+    for (int i = 0; i < this.files.length; i++) {
+      String[] completeLevelDuplicate = completeLevel;
+      String level = getLevel(this.files[i].getPath());
+
+      if (completeLevelDuplicate == null) {
+        completeLevelDuplicate = new String[1];
+        completeLevelDuplicate[0] = level;
+      } else {
+        String[] temp = new String[completeLevelDuplicate.length + 1];
+        for (int j = 0; j < completeLevelDuplicate.length; j++) {
+          temp[j] = completeLevelDuplicate[j];
+        }
+        temp[completeLevelDuplicate.length] = level;
+        completeLevelDuplicate = temp;
+      }
+
+      String duplicateCompleteLevelString = concatenateSamples(completeLevelDuplicate);
+      MarioResult result = null;
+      for (int j = 0; j < numberOfThreads; j++) {
+        if (threads[j] == null || !threads[j].isAlive()) {
+          runnables[j].setLevel(duplicateCompleteLevelString);
+          threads[j] = new Thread(runnables[j]);
+          threads[j].start();
+          break;
+        }
+      }
+
+      try {
+        for (int j = 0; j < numberOfThreads; j++) {
+          if (threads[j] != null && threads[j].isAlive()) {
+            threads[j].join();
+          }
+        }
+
+        for (int j = 0; j < numberOfThreads; j++) {
+          if (threads[j] != null && !threads[j].isAlive()) {
+            result = runnables[j].getResult();
+            if (result.getGameStatus() == GameStatus.WIN) {
+              completeLevel = completeLevelDuplicate;
+              mapSamples[mapSamplesIndex] = this.files[i].getName();
+              mapSamplesIndex++;
+
+              break;
+            }
+            break;
+          }
+        }
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+
+      if (completeLevel != null && completeLevel.length == 10) {
+        String completeLevelString = concatenateSamples(completeLevel);
+        String mapSamplesString = "";
+        for (int j = 0; j < mapSamples.length; j++) {
+          if (mapSamples[j] != null && j < mapSamples.length - 1) {
+            mapSamplesString += mapSamples[j] + ", ";
+          } else if (mapSamples[j] != null) {
+            mapSamplesString += mapSamples[j];
+          } else {
+            break;
+          }
+        }
+
+        saveLevelLogResults(result,
+            useOfAI.equals("default")
+                ? System.getProperty("user.dir") + "/" + pathToDirectory
+                    + "/generator_results/complete_levels_all_samples/"
+                : System.getProperty("user.dir") + "/" + pathToDirectory
+                    + "/generator_results/gan_generated_complete_levels_all_samples/",
+            "lvl_complete_" + completeLevelsIndex + "_log" + ".txt", mapSamplesString);
+
+        saveMap(completeLevelString,
+            useOfAI.equals("default")
+                ? System.getProperty("user.dir") + "/" + pathToDirectory
+                    + "/generator_results/complete_levels_all_samples/"
+                : System.getProperty("user.dir") + "/" + pathToDirectory
+                    + "/generator_results/gan_generated_complete_levels_all_samples/",
+            "lvl_complete_" + completeLevelsIndex + "_map" + ".txt");
+
+        completeLevelsIndex++;
+        mapSamplesIndex = 0;
         completeLevel = null;
       }
     }
