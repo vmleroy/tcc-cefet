@@ -1,4 +1,4 @@
-package thread;
+package runnables;
 
 import engine.core.MarioGame;
 import engine.core.MarioResult;

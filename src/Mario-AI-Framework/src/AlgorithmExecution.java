@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 import engine.core.MarioResult;
 import engine.helper.GameStatus;
-import thread.GameRunnable;
+import runnables.GameRunnable;
 
 public class AlgorithmExecution {
   private File[] files;
