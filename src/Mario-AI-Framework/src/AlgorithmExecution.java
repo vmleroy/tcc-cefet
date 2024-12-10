@@ -234,7 +234,6 @@ public class AlgorithmExecution {
                   this.files[i].getName());
               break;
             }
-            break;
           }
         }
 
@@ -354,10 +353,8 @@ public class AlgorithmExecution {
               completeLevel = completeLevelDuplicate;
               mapSamples[mapSamplesIndex] = winningSamples[i].getName();
               mapSamplesIndex++;
-
               break;
             }
-            break;
           }
         }
       } catch (InterruptedException e) {
@@ -452,10 +449,8 @@ public class AlgorithmExecution {
               completeLevel = completeLevelDuplicate;
               mapSamples[mapSamplesIndex] = this.files[i].getName();
               mapSamplesIndex++;
-
               break;
             }
-            break;
           }
         }
       } catch (InterruptedException e) {

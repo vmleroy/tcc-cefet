@@ -47,13 +47,13 @@ public class PlayLevel {
         AlgorithmExecution algorithm = new AlgorithmExecution(listOfFiles, useOfAI, pathToDirectory, numberOfThreads);
         switch (execution) {
             case "samples":
-                algorithm.executeOnlySamples(10);
+                algorithm.executeOnlySamples(60);
                 break;
             case "levels":
-                algorithm.executeGenerateLevelsWithWinSamples(60);
+                algorithm.executeGenerateLevelsWithWinSamples(120);
                 break;
             case "levels_all_samples":
-                algorithm.executeGenerateLevelsWithWinSamples(60);
+                algorithm.executeGenerateLevelsWithWinSamples(120);
                 break;
             default:
                 break;
