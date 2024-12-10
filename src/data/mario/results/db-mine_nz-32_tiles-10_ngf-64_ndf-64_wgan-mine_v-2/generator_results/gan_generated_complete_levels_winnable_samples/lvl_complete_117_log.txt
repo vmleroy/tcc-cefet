@@ -1,0 +1,20 @@
+Map Samples: sample_2631.txt, sample_2632.txt, sample_2634.txt, sample_2635.txt, sample_2636.txt, sample_2638.txt, sample_2639.txt, sample_2640.txt, sample_2641.txt, sample_2642.txt
+****************************************************************
+Game Status: WIN
+Percentage Completion: 1.0
+Remaining Time: 46
+
+Lives: 0
+Coins: 1
+
+Mario State: 0
+(Mushrooms: 0 Fire Flowers: 0)
+
+Total Kills: 4
+(Stomps: 4 Fireballs: 0 Shells: 0 Falls: 0)
+
+Bricks: 0
+Jumps: 18
+Max X Jump: 232.72162
+Max Air Time: 24
+****************************************************************

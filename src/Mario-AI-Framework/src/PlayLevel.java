@@ -50,10 +50,10 @@ public class PlayLevel {
                 algorithm.executeOnlySamples(10);
                 break;
             case "levels":
-                algorithm.executeGenerateLevelsWithWinSamples(40);
+                algorithm.executeGenerateLevelsWithWinSamples(60);
                 break;
             case "levels_all_samples":
-                algorithm.executeGenerateLevelsWithWinSamples(40);
+                algorithm.executeGenerateLevelsWithWinSamples(60);
                 break;
             default:
                 break;

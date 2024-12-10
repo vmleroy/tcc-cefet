@@ -2,7 +2,7 @@ Map Samples: sample_0.txt, sample_1.txt, sample_4.txt, sample_5.txt, sample_7.tx
 ****************************************************************
 Game Status: WIN
 Percentage Completion: 1.0
-Remaining Time: 28
+Remaining Time: 48
 
 Lives: 0
 Coins: 0
