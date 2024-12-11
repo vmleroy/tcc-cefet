@@ -1,0 +1,20 @@
+Map Samples: sample_3010.txt, sample_3011.txt, sample_3012.txt, sample_3013.txt, sample_3015.txt, sample_3016.txt, sample_3017.txt, sample_3018.txt, sample_3019.txt, sample_3021.txt
+****************************************************************
+Game Status: WIN
+Percentage Completion: 1.0
+Remaining Time: 107
+
+Lives: 0
+Coins: 0
+
+Mario State: 0
+(Mushrooms: 0 Fire Flowers: 0)
+
+Total Kills: 5
+(Stomps: 5 Fireballs: 0 Shells: 0 Falls: 0)
+
+Bricks: 0
+Jumps: 23
+Max X Jump: 233.3894
+Max Air Time: 22
+****************************************************************
