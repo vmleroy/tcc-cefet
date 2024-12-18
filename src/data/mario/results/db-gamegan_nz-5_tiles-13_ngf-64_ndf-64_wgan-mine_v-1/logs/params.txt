@@ -1,0 +1,24 @@
+dataset: src/data/mario/mario_levels_gamegan.json
+experiment: src/data/mario/results/db-gamegan_nz-5_tiles-13_ngf-64_ndf-64_wgan-mine_v-1
+tiles: 13
+batchSize: 32
+nz: 32
+ngf: 64
+ndf: 64
+niter: 5000
+Diters: 5
+lrD: 5e-05
+lrG: 5e-05
+beta1: 0.5
+cuda: True
+ngpu: 1
+netG: 
+netD: 
+clamp_lower: -0.01
+clamp_upper: 0.01
+n_extra_layers: 0
+adam: False
+manualSeed: 1780
+
+
+Time taken: 00:31:01

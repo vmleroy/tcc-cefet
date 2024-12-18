@@ -1,0 +1,20 @@
+Map Samples: sample_8380.txt, sample_8381.txt, sample_8382.txt, sample_8383.txt, sample_8384.txt, sample_8385.txt, sample_8386.txt, sample_8387.txt, sample_8390.txt, sample_8391.txt
+****************************************************************
+Game Status: WIN
+Percentage Completion: 1.0
+Remaining Time: 47
+
+Lives: 0
+Coins: 1
+
+Mario State: 0
+(Mushrooms: 0 Fire Flowers: 0)
+
+Total Kills: 8
+(Stomps: 8 Fireballs: 0 Shells: 0 Falls: 0)
+
+Bricks: 0
+Jumps: 18
+Max X Jump: 256.13715
+Max Air Time: 23
+****************************************************************

@@ -1,0 +1,20 @@
+Map Samples: sample_2450.txt, sample_2451.txt, sample_2453.txt, sample_2454.txt, sample_2455.txt, sample_2456.txt, sample_2458.txt, sample_2460.txt, sample_2461.txt, sample_2462.txt
+****************************************************************
+Game Status: WIN
+Percentage Completion: 1.0
+Remaining Time: 47
+
+Lives: 0
+Coins: 0
+
+Mario State: 0
+(Mushrooms: 0 Fire Flowers: 0)
+
+Total Kills: 3
+(Stomps: 3 Fireballs: 0 Shells: 0 Falls: 0)
+
+Bricks: 0
+Jumps: 20
+Max X Jump: 239.9978
+Max Air Time: 21
+****************************************************************

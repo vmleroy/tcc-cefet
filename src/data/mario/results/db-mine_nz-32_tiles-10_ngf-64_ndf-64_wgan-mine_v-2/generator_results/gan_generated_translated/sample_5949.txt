@@ -1,0 +1,14 @@
+----------------------------
+----------------------------
+SSSSSSSSSSSSSSSSSSSSSSSSSSSS
+SSSSSSSSSSS------------S--SS
+SSSSSSSSSS?------------S--SS
+SSSSSSSSSS---S------------SS
+----------------------------
+----------------------------
+-----------------------SS---
+SSSSSSSSSSS--------E?------X
+---SSSSSSS--------<>-------X
+--SSSSSSSSS-----XX[]X------X
+---SSSSSSS------[-[]X----XXX
+XXXXXXXXXXXXXXXXXXXX--XXXXXX

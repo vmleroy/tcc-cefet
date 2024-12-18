@@ -1,0 +1,20 @@
+Map Samples: sample_2075.txt, sample_2077.txt, sample_2078.txt, sample_2079.txt, sample_2080.txt, sample_2083.txt, sample_2084.txt, sample_2085.txt, sample_2086.txt, sample_2087.txt
+****************************************************************
+Game Status: WIN
+Percentage Completion: 1.0
+Remaining Time: 106
+
+Lives: 0
+Coins: 0
+
+Mario State: 0
+(Mushrooms: 0 Fire Flowers: 0)
+
+Total Kills: 15
+(Stomps: 15 Fireballs: 0 Shells: 0 Falls: 0)
+
+Bricks: 0
+Jumps: 22
+Max X Jump: 396.45776
+Max Air Time: 37
+****************************************************************

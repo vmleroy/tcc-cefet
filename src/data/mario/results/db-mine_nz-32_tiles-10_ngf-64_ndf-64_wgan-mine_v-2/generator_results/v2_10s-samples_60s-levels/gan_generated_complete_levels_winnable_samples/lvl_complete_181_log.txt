@@ -1,0 +1,20 @@
+Map Samples: sample_5139.txt, sample_5140.txt, sample_5141.txt, sample_5142.txt, sample_5143.txt, sample_5144.txt, sample_5145.txt, sample_5147.txt, sample_5148.txt, sample_5149.txt
+****************************************************************
+Game Status: WIN
+Percentage Completion: 1.0
+Remaining Time: 47
+
+Lives: 0
+Coins: 0
+
+Mario State: 0
+(Mushrooms: 0 Fire Flowers: 0)
+
+Total Kills: 10
+(Stomps: 10 Fireballs: 0 Shells: 0 Falls: 0)
+
+Bricks: 0
+Jumps: 19
+Max X Jump: 337.05112
+Max Air Time: 30
+****************************************************************
