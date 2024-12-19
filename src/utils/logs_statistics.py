@@ -262,7 +262,7 @@ files_version = 'v3'
 
 
 
-def convert_log (file):
+def convert_log (file, type = 'sample') -> Logs2D:
   object_logs: Logs2D = {
     'map_samples': [],
     'game_status': '',
@@ -290,8 +290,9 @@ def convert_log (file):
         case string if string.find('Percentage Completion') != -1:
           object_logs['percentage_completion'] = line.split(':')[1].strip()
         case string if string.find('Remaining Time') != -1:
+          map_time = 60 if type == 'sample' else 120
           object_logs['remaining_time'] = line.split(':')[1].strip()
-          object_logs['elapsed_time'] = 120 - float(line.split(':')[1].strip())
+          object_logs['elapsed_time'] = map_time - float(line.split(':')[1].strip())
         case string if string.find('Lives') != -1:
           object_logs['lives'] = line.split(':')[1].strip()
         case string if string.find('Coins') != -1:
@@ -535,32 +536,32 @@ for dir in os.listdir(file_path):
         match (subDir):
           case string if string.find('translated_logs') != -1:
             for file in os.listdir(f'{file_path}/{dir}/{subDir}'):
-              gan_generation_logs['samples'][file] = convert_log(f'{file_path}/{dir}/{subDir}/{file}')
+              gan_generation_logs['samples'][file] = convert_log(f'{file_path}/{dir}/{subDir}/{file}', 'sample')
                 
           case string if string.find('all_samples') != -1:
             for file in os.listdir(f'{file_path}/{dir}/{subDir}'):
               if (file.find('log') != -1):
-                gan_generation_logs['levels_all_samples'][file] = convert_log(f'{file_path}/{dir}/{subDir}/{file}')
+                gan_generation_logs['levels_all_samples'][file] = convert_log(f'{file_path}/{dir}/{subDir}/{file}', 'level')
                 
           case string if string.find('winnable_samples') != -1:
             for file in os.listdir(f'{file_path}/{dir}/{subDir}'):
               if (file.find('log') != -1):
-                gan_generation_logs['levels_winnable_samples'][file] = convert_log(f'{file_path}/{dir}/{subDir}/{file}')
+                gan_generation_logs['levels_winnable_samples'][file] = convert_log(f'{file_path}/{dir}/{subDir}/{file}', 'level')
       else:
         match (subDir):
           case string if string.find('translated_logs') != -1:
             for file in os.listdir(f'{file_path}/{dir}/{subDir}'):
-              selection_generation_logs['samples'][file] = convert_log(f'{file_path}/{dir}/{subDir}/{file}')
+              selection_generation_logs['samples'][file] = convert_log(f'{file_path}/{dir}/{subDir}/{file}', 'sample')
                 
           case string if string.find('all_samples') != -1:
             for file in os.listdir(f'{file_path}/{dir}/{subDir}'):
               if (file.find('log') != -1):
-                selection_generation_logs['levels_all_samples'][file] = convert_log(f'{file_path}/{dir}/{subDir}/{file}')
+                selection_generation_logs['levels_all_samples'][file] = convert_log(f'{file_path}/{dir}/{subDir}/{file}', 'level')
                 
           case string if string.find('winnable_samples') != -1:
             for file in os.listdir(f'{file_path}/{dir}/{subDir}'):
               if (file.find('log') != -1):
-                selection_generation_logs['levels_winnable_samples'][file] = convert_log(f'{file_path}/{dir}/{subDir}/{file}')
+                selection_generation_logs['levels_winnable_samples'][file] = convert_log(f'{file_path}/{dir}/{subDir}/{file}', 'level')
 
 for key in gan_generation_logs:
   match (key):
@@ -608,8 +609,5 @@ print('GAN results:')
 pprint.pp(gan_results)
 print()
 print('Selection results:')
-pprint.pp(selection_results)
-
-
-      
+pprint.pp(selection_results)    
         
