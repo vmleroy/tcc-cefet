@@ -18,14 +18,14 @@ map_size = (sample_size[0] * sample_quantity * sprite_size[0], sample_size[1] * 
 
 mapsheet = {
   "X": (1, 0),
-  "S": (1, 6),
+  "S": (6, 0),
   "-": (2, 5),
   "?": (0, 1),
   "Q": (6, 1),
   "<": (2, 2),
-  ">": (2, 3),
-  "[": (2, 4),
-  "]": (2, 5),
+  ">": (3, 2),
+  "[": (4, 2),
+  "]": (5, 2),
 }
 enemysheet = {
   'E': (0, 5)
@@ -124,8 +124,6 @@ for key in selection_maps:
     FILE = file.read()
     selection_maps[key]['winnable_samples']['map'] = FILE
     
-print(gan_maps)
-
 def create_map(map, name):
   map = map.split('\n')
   map = [list(row) for row in map]
@@ -143,4 +141,10 @@ def create_map(map, name):
 if not os.path.exists(save_path):
   os.mkdir(save_path)
 
-create_map(gan_maps['easy']['all_samples']['map'], f'gan_easy_all_samples__{gan_maps["easy"]["all_samples"]["name"]}')
+for key in gan_maps:
+  create_map(gan_maps[key]['all_samples']['map'], f'gan_{key}_all_samples')
+  create_map(gan_maps[key]['winnable_samples']['map'], f'gan_{key}_winnable_samples')
+
+for key in selection_maps:
+  create_map(selection_maps[key]['all_samples']['map'], f'selection_{key}_all_samples')
+  create_map(selection_maps[key]['winnable_samples']['map'], f'selection_{key}_winnable_samples')
