@@ -1,2 +1,2 @@
-# TCC - CEFET-MG - WGAN x VAE Generation for Super Mario and Zelda maps
+# TCC - CEFET-MG - WGAN Generation for Super Mario
 Victor Le Roy Matos
