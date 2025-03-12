@@ -3,6 +3,7 @@ import pprint
 import typing
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 Logs2D = typing.TypedDict('Logs2D', {
   'map_samples': typing.List[str],
@@ -294,7 +295,7 @@ def convert_log (file, type = 'sample') -> Logs2D:
         case string if string.find('Remaining Time') != -1:
           map_time = 60 if type == 'sample' else 120
           object_logs['remaining_time'] = line.split(':')[1].strip()
-          object_logs['elapsed_time'] = map_time - float(line.split(':')[1].strip())
+          object_logs['elapsed_time'] = map_time - int(line.split(':')[1].strip())
         case string if string.find('Lives') != -1:
           object_logs['lives'] = line.split(':')[1].strip()
         case string if string.find('Coins') != -1:
@@ -532,10 +533,10 @@ def calculate_statistics(logs: dict):
 def get_data_to_histogram(logs: dict):
   logs_difficulty = find_difficulty(logs)
   
-  jumps_values = [float(log['jumps']) for log in logs_difficulty.values()]
-  enemies_killed_values = [float(log['total_kills']) for log in logs_difficulty.values()]
-  difficulty_values = [float(log['difficulty']) for log in logs_difficulty.values()]
-  time_values = [float(log['elapsed_time']) for log in logs_difficulty.values()]
+  jumps_values = [int(log['jumps']) for log in logs_difficulty.values()]
+  enemies_killed_values = [int(log['total_kills']) for log in logs_difficulty.values()]
+  difficulty_values = [int(log['difficulty']) for log in logs_difficulty.values()]
+  time_values = [int(log['elapsed_time']) for log in logs_difficulty.values()]
   
   return {
     'jumps': jumps_values,
@@ -586,8 +587,33 @@ def covariance_matrix(logs: dict, path: str):
   # Create a covariance matrix
   covariance_matrix = np.cov(x)
   
-  # Save the covariance matrix as a CSV file
-  np.savetxt(path, covariance_matrix, delimiter=',')
+  # Add labels to the covariance matrix
+  column_labels = ['Jumps', 'Enemies Killed', 'Difficulty', 'Time']
+  row_labels = ['Jumps', 'Enemies Killed', 'Difficulty', 'Time']
+  
+  # Create a DataFrame from the covariance matrix
+  df = pd.DataFrame(covariance_matrix, columns=column_labels, index=row_labels)
+  
+  # Save the DataFrame to a CSV file
+  df.to_csv(path, index=False)
+  
+def normalized_covariance_matrix(logs: dict, path: str):
+  histogram_data = get_data_to_histogram(logs)
+  x = np.array([histogram_data['jumps'], histogram_data['enemies_killed'], histogram_data['difficulty'], histogram_data['time']])
+
+  # Create a covariance matrix
+  covariance_matrix = np.corrcoef(x)
+
+  # Add labels to the normalized covariance matrix
+  column_labels = ['Jumps', 'Enemies Killed', 'Difficulty', 'Time']
+  row_labels = ['Jumps', 'Enemies Killed', 'Difficulty', 'Time']
+
+  # Create a DataFrame from the normalized covariance matrix
+  df = pd.DataFrame(covariance_matrix, columns=column_labels, index=row_labels)
+
+  # Save the DataFrame to a CSV file
+  df.to_csv(path, index=False)
+  
 
 for dir in os.listdir(file_path):
   if dir.startswith(files_version):
@@ -686,6 +712,14 @@ all_samples_selection_covariance_matrix = covariance_matrix(selection_generation
 all_samples_gan_covariance_matrix = covariance_matrix(gan_generation_logs['levels_all_samples'], covariance_matrices_folder + '/all_samples_gan_covariance_matrix.csv')
 winnable_samples_selection_covariance_matrix = covariance_matrix(selection_generation_logs['levels_winnable_samples'], covariance_matrices_folder + '/winnable_samples_selection_covariance_matrix.csv')
 winnable_samples_gan_covariance_matrix = covariance_matrix(gan_generation_logs['levels_winnable_samples'], covariance_matrices_folder + '/winnable_samples_gan_covariance_matrix.csv')
+
+# Save normalized covariance matrices
+normalized_covariance_matrices_folder = 'src/data/mario/results/db-mine_nz-32_tiles-10_ngf-64_ndf-64_wgan-mine_v-2/statistics/normalized_covariance_matrices'
+
+all_samples_selection_normalized_covariance_matrix = normalized_covariance_matrix(selection_generation_logs['levels_all_samples'], normalized_covariance_matrices_folder + '/all_samples_selection_normalized_covariance_matrix.csv')
+all_samples_gan_normalized_covariance_matrix = normalized_covariance_matrix(gan_generation_logs['levels_all_samples'], normalized_covariance_matrices_folder + '/all_samples_gan_normalized_covariance_matrix.csv')
+winnable_samples_selection_normalized_covariance_matrix = normalized_covariance_matrix(selection_generation_logs['levels_winnable_samples'], normalized_covariance_matrices_folder + '/winnable_samples_selection_normalized_covariance_matrix.csv')
+winnable_samples_gan_normalized_covariance_matrix = normalized_covariance_matrix(gan_generation_logs['levels_winnable_samples'], normalized_covariance_matrices_folder + '/winnable_samples_gan_normalized_covariance_matrix.csv')
 
 
         

@@ -4,3 +4,4 @@ matplotlib
 numpy
 cma
 Pillow
+pandas
