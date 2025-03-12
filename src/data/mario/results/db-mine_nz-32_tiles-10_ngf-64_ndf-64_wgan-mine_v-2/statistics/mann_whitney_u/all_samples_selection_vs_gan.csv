@@ -1,0 +1,16 @@
+Mann-Whitney U test for jumps:
+U Statistic: 1318.0
+P-Value: 0.013132715132938183
+
+Mann-Whitney U test for enemies_killed:
+U Statistic: 573.5
+P-Value: 9.002532075199773e-08
+
+Mann-Whitney U test for difficulty:
+U Statistic: 2613.5
+P-Value: 0.013006175631544112
+
+Mann-Whitney U test for time:
+U Statistic: 1239.0
+P-Value: 0.0020065431499127115
+

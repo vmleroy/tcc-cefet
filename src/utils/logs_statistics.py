@@ -613,22 +613,17 @@ def normalized_covariance_matrix(logs: dict, path: str):
   # Save the DataFrame to a CSV file
   df.to_csv(path, index=True)
   
-def calculate_mann_whitney_u(logs: dict, path: str):
-  histogram_data = get_data_to_histogram(logs)
+def calculate_mann_whitney_u(logs_g1: dict, logs_g2: dict, path: str):
+  logs_g1_data = get_data_to_histogram(logs_g1)
+  logs_g2_data = get_data_to_histogram(logs_g2)
   
   # Perform the Mann-Whitney U test for all pairs of variables
   with open(path, 'w') as f:
-    for key, index in enumerate(histogram_data):
-      for key2, index2 in enumerate(histogram_data):
-        if key != key2:
-          stat, p = stats.mannwhitneyu(histogram_data[index], histogram_data[index2])
-          print(f'Mann-Whitney U test between {index} and {index2}:')
-          print(f'Statistics={stat}, p={p}')
-          print()
-
-          # Save the results to a file
-          f.write(f'Test between -- {index} -- and -- {index2} --:\n')
-          f.write(f'Statistics={stat}, p={p}\n\n')
+    for key in logs_g1_data:
+      u_statistic, p_value = stats.mannwhitneyu(logs_g1_data[key], logs_g2_data[key])
+      f.write(f'Mann-Whitney U test for {key}:\n')
+      f.write(f'U Statistic: {u_statistic}\n')
+      f.write(f'P-Value: {p_value}\n\n')
   
   
   
@@ -742,10 +737,8 @@ winnable_samples_gan_normalized_covariance_matrix = normalized_covariance_matrix
 # Save Mann-Whitney U test results
 mann_whitney_u_folder = 'src/data/mario/results/db-mine_nz-32_tiles-10_ngf-64_ndf-64_wgan-mine_v-2/statistics/mann_whitney_u'
 
-alL_samples_selection_mann_whitney_u = calculate_mann_whitney_u(selection_generation_logs['levels_all_samples'], mann_whitney_u_folder + '/all_samples_selection_mann_whitney_u.txt')
-all_samples_gan_mann_whitney_u = calculate_mann_whitney_u(gan_generation_logs['levels_all_samples'], mann_whitney_u_folder + '/all_samples_gan_mann_whitney_u.txt')
-winnable_samples_selection_mann_whitney_u = calculate_mann_whitney_u(selection_generation_logs['levels_winnable_samples'], mann_whitney_u_folder + '/winnable_samples_selection_mann_whitney_u.txt')
-winnable_samples_gan_mann_whitney_u = calculate_mann_whitney_u(gan_generation_logs['levels_winnable_samples'], mann_whitney_u_folder + '/winnable_samples_gan_mann_whitney_u.txt')
+mann_whitney_u_all_samples = calculate_mann_whitney_u(selection_generation_logs['levels_all_samples'], gan_generation_logs['levels_all_samples'], mann_whitney_u_folder + '/all_samples_selection_vs_gan.csv')
+mann_whitney_u_winnable_samples = calculate_mann_whitney_u(selection_generation_logs['levels_winnable_samples'], gan_generation_logs['levels_winnable_samples'], mann_whitney_u_folder + '/winnable_samples_selection_vs_gan.csv')
 
 
         
