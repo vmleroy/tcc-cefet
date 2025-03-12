@@ -1,6 +1,8 @@
 import os
 import pprint
 import typing
+import matplotlib.pyplot as plt
+import numpy as np
 
 Logs2D = typing.TypedDict('Logs2D', {
   'map_samples': typing.List[str],
@@ -527,7 +529,65 @@ def calculate_statistics(logs: dict):
   
   return result_logs
 
-
+def get_data_to_histogram(logs: dict):
+  logs_difficulty = find_difficulty(logs)
+  
+  jumps_values = [float(log['jumps']) for log in logs_difficulty.values()]
+  enemies_killed_values = [float(log['total_kills']) for log in logs_difficulty.values()]
+  difficulty_values = [float(log['difficulty']) for log in logs_difficulty.values()]
+  time_values = [float(log['elapsed_time']) for log in logs_difficulty.values()]
+  
+  return {
+    'jumps': jumps_values,
+    'enemies_killed': enemies_killed_values,
+    'difficulty': difficulty_values,
+    'time': time_values
+  }
+  
+def plot_histograms(logs: dict, path: str):
+  histogram_data = get_data_to_histogram(logs)
+  # Create subplots
+  fig, axs = plt.subplots(2, 2, figsize=(12, 10))
+  
+  # Plot Jumps Histogram
+  axs[0, 0].hist(histogram_data['jumps'], color='blue', alpha=0.7, density=True)
+  axs[0, 0].set_title('Histogram of Jumps')
+  axs[0, 0].set_xlabel('Number of Jumps')
+  axs[0, 0].set_ylabel('Frequency')
+  
+  # Plot Kills Histogram
+  axs[0, 1].hist(histogram_data['enemies_killed'], color='green', alpha=0.7, density=True)
+  axs[0, 1].set_title('Histogram of Enemies Killed')
+  axs[0, 1].set_xlabel('Number of Enemies Killed')
+  axs[0, 1].set_ylabel('Frequency')
+  
+  # Plot Time Histogram
+  axs[1, 0].hist(histogram_data['time'], color='orange', alpha=0.7, density=True)
+  axs[1, 0].set_title('Histogram of Elapsed Time')
+  axs[1, 0].set_xlabel('Elapsed Time (seconds)')
+  axs[1, 0].set_ylabel('Frequency')
+  
+  # Plot Difficulty Histogram
+  axs[1, 1].hist(histogram_data['difficulty'], color='purple', alpha=0.7, density=True)
+  axs[1, 1].set_title('Histogram of Difficulty')
+  axs[1, 1].set_xlabel('Difficulty Score')
+  axs[1, 1].set_ylabel('Frequency')
+  
+  # Adjust layout
+  plt.tight_layout()
+    
+  # Save the plot as an image
+  plt.savefig(path)
+  
+def covariance_matrix(logs: dict, path: str):
+  histogram_data = get_data_to_histogram(logs)
+  x = np.array([histogram_data['jumps'], histogram_data['enemies_killed'], histogram_data['difficulty'], histogram_data['time']])
+  
+  # Create a covariance matrix
+  covariance_matrix = np.cov(x)
+  
+  # Save the covariance matrix as a CSV file
+  np.savetxt(path, covariance_matrix, delimiter=',')
 
 for dir in os.listdir(file_path):
   if dir.startswith(files_version):
@@ -610,4 +670,22 @@ pprint.pp(gan_results)
 print()
 print('Selection results:')
 pprint.pp(selection_results)    
+
+# Generate histograms
+histograms_folder = 'src/data/mario/results/db-mine_nz-32_tiles-10_ngf-64_ndf-64_wgan-mine_v-2/statistics/histograms'
+
+all_samples_selection_histogram = plot_histograms(selection_generation_logs['levels_all_samples'], histograms_folder + '/all_samples_selection_histogram.png')
+all_samples_gan_histogram = plot_histograms(gan_generation_logs['levels_all_samples'], histograms_folder + '/all_samples_gan_histogram.png')
+winnable_samples_selection_histogram = plot_histograms(selection_generation_logs['levels_winnable_samples'], histograms_folder + '/winnable_samples_selection_histogram.png')
+winnable_samples_gan_histogram = plot_histograms(gan_generation_logs['levels_winnable_samples'], histograms_folder + '/winnable_samples_gan_histogram.png')
+
+# Save covariance matrices
+covariance_matrices_folder = 'src/data/mario/results/db-mine_nz-32_tiles-10_ngf-64_ndf-64_wgan-mine_v-2/statistics/covariance_matrices'
+
+all_samples_selection_covariance_matrix = covariance_matrix(selection_generation_logs['levels_all_samples'], covariance_matrices_folder + '/all_samples_selection_covariance_matrix.csv')
+all_samples_gan_covariance_matrix = covariance_matrix(gan_generation_logs['levels_all_samples'], covariance_matrices_folder + '/all_samples_gan_covariance_matrix.csv')
+winnable_samples_selection_covariance_matrix = covariance_matrix(selection_generation_logs['levels_winnable_samples'], covariance_matrices_folder + '/winnable_samples_selection_covariance_matrix.csv')
+winnable_samples_gan_covariance_matrix = covariance_matrix(gan_generation_logs['levels_winnable_samples'], covariance_matrices_folder + '/winnable_samples_gan_covariance_matrix.csv')
+
+
         
