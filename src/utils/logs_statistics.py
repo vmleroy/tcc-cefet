@@ -533,10 +533,10 @@ def calculate_statistics(logs: dict):
 def get_data_to_histogram(logs: dict):
   logs_difficulty = find_difficulty(logs)
   
-  jumps_values = [int(log['jumps']) for log in logs_difficulty.values()]
-  enemies_killed_values = [int(log['total_kills']) for log in logs_difficulty.values()]
-  difficulty_values = [int(log['difficulty']) for log in logs_difficulty.values()]
-  time_values = [int(log['elapsed_time']) for log in logs_difficulty.values()]
+  jumps_values = [float(log['jumps']) for log in logs_difficulty.values()]
+  enemies_killed_values = [float(log['total_kills']) for log in logs_difficulty.values()]
+  difficulty_values = [float(log['difficulty']) for log in logs_difficulty.values()]
+  time_values = [float(log['elapsed_time']) for log in logs_difficulty.values()]
   
   return {
     'jumps': jumps_values,
@@ -582,7 +582,7 @@ def plot_histograms(logs: dict, path: str):
   
 def covariance_matrix(logs: dict, path: str):
   histogram_data = get_data_to_histogram(logs)
-  x = np.array([histogram_data['jumps'], histogram_data['enemies_killed'], histogram_data['difficulty'], histogram_data['time']])
+  x = np.ma.array([histogram_data['jumps'], histogram_data['enemies_killed'], histogram_data['difficulty'], histogram_data['time']])
   
   # Create a covariance matrix
   covariance_matrix = np.cov(x)
@@ -591,15 +591,14 @@ def covariance_matrix(logs: dict, path: str):
   column_labels = ['Jumps', 'Enemies Killed', 'Difficulty', 'Time']
   row_labels = ['Jumps', 'Enemies Killed', 'Difficulty', 'Time']
   
-  # Create a DataFrame from the covariance matrix
   df = pd.DataFrame(covariance_matrix, columns=column_labels, index=row_labels)
   
   # Save the DataFrame to a CSV file
-  df.to_csv(path, index=False)
+  df.to_csv(path, index=True)
   
 def normalized_covariance_matrix(logs: dict, path: str):
   histogram_data = get_data_to_histogram(logs)
-  x = np.array([histogram_data['jumps'], histogram_data['enemies_killed'], histogram_data['difficulty'], histogram_data['time']])
+  x = np.ma.array([histogram_data['jumps'], histogram_data['enemies_killed'], histogram_data['difficulty'], histogram_data['time']])
 
   # Create a covariance matrix
   covariance_matrix = np.corrcoef(x)
@@ -607,12 +606,11 @@ def normalized_covariance_matrix(logs: dict, path: str):
   # Add labels to the normalized covariance matrix
   column_labels = ['Jumps', 'Enemies Killed', 'Difficulty', 'Time']
   row_labels = ['Jumps', 'Enemies Killed', 'Difficulty', 'Time']
-
-  # Create a DataFrame from the normalized covariance matrix
+  
   df = pd.DataFrame(covariance_matrix, columns=column_labels, index=row_labels)
-
+  
   # Save the DataFrame to a CSV file
-  df.to_csv(path, index=False)
+  df.to_csv(path, index=True)
   
 
 for dir in os.listdir(file_path):
