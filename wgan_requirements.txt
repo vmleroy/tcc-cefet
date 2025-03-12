@@ -5,3 +5,5 @@ numpy
 cma
 Pillow
 pandas
+stubs
+scipy

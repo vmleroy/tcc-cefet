@@ -1,0 +1,36 @@
+Test between -- jumps -- and -- enemies_killed --:
+Statistics=30920.5, p=5.86402942971408e-59
+
+Test between -- jumps -- and -- difficulty --:
+Statistics=30976.0, p=2.7395740723171108e-59
+
+Test between -- jumps -- and -- time --:
+Statistics=30384.5, p=2.028602736248957e-57
+
+Test between -- enemies_killed -- and -- jumps --:
+Statistics=55.5, p=5.86402942971408e-59
+
+Test between -- enemies_killed -- and -- difficulty --:
+Statistics=30976.0, p=2.8026163460988393e-59
+
+Test between -- enemies_killed -- and -- time --:
+Statistics=1258.0, p=1.1147160095396538e-52
+
+Test between -- difficulty -- and -- jumps --:
+Statistics=0.0, p=2.7395740723171108e-59
+
+Test between -- difficulty -- and -- enemies_killed --:
+Statistics=0.0, p=2.8026163460988393e-59
+
+Test between -- difficulty -- and -- time --:
+Statistics=0.0, p=1.0848159252373975e-61
+
+Test between -- time -- and -- jumps --:
+Statistics=591.5, p=2.028602736248957e-57
+
+Test between -- time -- and -- enemies_killed --:
+Statistics=29718.0, p=1.1147160095396538e-52
+
+Test between -- time -- and -- difficulty --:
+Statistics=30976.0, p=1.0848159252373975e-61
+
